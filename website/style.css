@@ -1,0 +1,139 @@
+@font-face {
+    font-family: 'ScopeOne-Regular';
+    src: url('assets/fonts/ScopeOne-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'LexendExa';
+    src: url('assets/fonts/LexendExa-VariableFont_wght.ttf')format('truetype');
+}
+body{
+    margin:0px;
+    padding:0;
+    background-color:#ffffff;
+    margin-left:30px;
+    margin-right: 30px;
+}
+.bodynorm{
+    padding-top: 65px;
+}
+/*================All Pages=============*/
+/*Text Editing*/
+h1{
+    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 25px;
+    color: #B84C65;
+    font-weight:500;
+    background-color: #f5dddd;
+    padding:10px;
+    border-radius: 24px;
+
+}
+h2{
+    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:#cc6b82;
+    font-weight:700;
+}
+h3{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color:#cc6b82;
+    font-weight: 600;
+    text-indent:10px;
+}
+p{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+    text-indent: 10px;
+}
+/*NavBar&Logo*/
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background-color: #FFF2FF;
+    box-shadow: 0 4px 6px rgba(20, 19, 19, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:#B84C65;
+   
+}
+.logopic{
+    width:50px;
+    height:50px;
+    margin-right: 10px;
+}
+/*NavBar Links*/
+ul{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+}
+li{
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+li a{
+    text-decoration: none;
+    color:#B84C65;
+}
+li a:hover{
+    color: #ffffff;
+    background-color:#cc6b82;
+    padding: 2px 10px;
+    border-radius: 4px;
+}
+/*=========HomePage*=============/
+/*Search Bar*/
+.searcharea{
+    padding: 5%;
+    background-color: rgb(246, 230, 231);
+    border-radius: 30px;
+    padding: 10px;
+    align-items: center;
+    padding-bottom:30px;
+}
+.searchtitle{
+    text-align: center;
+    margin-top: 80px;
+    font-family: LexendExa, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:#B84C65;
+    font-weight: 400;
+}
+.searchbar{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.searchbarbar{
+    width: 400px;
+    border-radius:24px;
+    padding-top:10px;
+    padding-bottom:10px;
+    border: 2px solid #cc6b82;
+    text-indent: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+button{
+    border:none;
+    background: transparent;
+}
+.searchbutton{
+    width: 30px;
+    height: 30px;
+}
+/*=========Report Page=========*/
+.studyID{
+    font-weight:500;
+}

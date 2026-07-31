@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Report</title>
+        <link href="style.css" rel="stylesheet" type="text/css"/>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognitalogo" class="logopic">
+                </a>Evidence Intelligence Project
+            </div>
+        </nav>
+    </head>
+    
+    <body class="bodynorm">
+        
+        <div class="EvIntReport">
+            <h1 id="claim"></h1>
+
+            <h3>Confidence Score</h3>
+            <p id="score"></p>
+
+            <h3>Evidence Strength</h3>
+            <p id="strength"></p>
+
+            <h3>Population</h3>
+            <p id="population"></p>
+
+            <h3>Intervention</h3>
+            <p id="intervention"></p>
+
+            <h3>Supporting Studies</h3>
+            <p id="studies"></p>
+        </div>
+        <div>
+            <h2>Study Breakdown</h2>
+            <div id="breakdown"></div>
+        </div>
+        <script>
+            async function loadReport() {
+
+                const params = new URLSearchParams(window.location.search);
+                const claimId = params.get("claim");
+
+                let report;
+
+                if (claimId) {
+                    // Direct link, e.g. reportpage.html?claim=C0001
+                    let response;
+
+                    try {
+                        response = await fetch(`/claim/${claimId}`);
+                    } catch (err) {
+                        document.body.innerHTML =
+                            "<p>Couldn't reach the Evidence Intelligence server. " +
+                            "Make sure app.py is running on port 5001.</p>";
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        document.body.innerHTML =
+                            `<p>Claim ${claimId} not found.</p>`;
+                        return;
+                    }
+
+                    report = await response.json();
+
+                    // Keep localStorage in sync so refreshing still works
+                    localStorage.setItem("report", JSON.stringify(report));
+
+                } else {
+                    // Fallback: came here via the search box on index.html
+                    const stored = localStorage.getItem("report");
+
+                    if (!stored) {
+                        document.body.innerHTML =
+                            "<p>No report to show. " +
+                            "<a href=\"index.html\">Search for a claim</a>.</p>";
+                        return;
+                    }
+
+                    report = JSON.parse(stored);
+                }
+
+                document.getElementById("claim").textContent =
+                    report.claim;
+
+                document.getElementById("population").textContent =
+                    report.population;
+
+                document.getElementById("intervention").textContent =
+                    report.intervention;
+
+                document.getElementById("score").textContent =
+                    report.confidence_score + "/100";
+
+                document.getElementById("strength").textContent =
+                    report.evidence_strength;
+
+                document.getElementById("studies").textContent =
+                    report.supporting_studies.join(", ");
+
+                const breakdownContainer = document.getElementById("breakdown");
+
+                if (report.study_breakdown && report.study_breakdown.length > 0) {
+                    report.study_breakdown.forEach((study) => {
+                        const idHeading = document.createElement("h3");
+                        idHeading.className = "studyID";
+                        idHeading.textContent = study.study_id;
+
+                        const scoreLine = document.createElement("p");
+                        scoreLine.textContent =
+                            `Quality Score: ${study.quality_score}`;
+
+                        breakdownContainer.appendChild(idHeading);
+                        breakdownContainer.appendChild(scoreLine);
+                    });
+                } else {
+                    breakdownContainer.textContent =
+                        "No study breakdown available.";
+                }
+            }
+
+            loadReport();
+        </script>
+    </body>
+</html>
