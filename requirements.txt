@@ -1,6 +1,7 @@
-flask
-flask-cors
-gunicorn
-pandas
-gspread
-google-auth
+flask>=2.3,<4
+flask-cors>=4,<7
+gunicorn>=21,<24
+numpy>=2,<3
+pandas>=3,<4
+gspread>=5,<7
+google-auth>=2,<4

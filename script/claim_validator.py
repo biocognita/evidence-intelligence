@@ -1,12 +1,9 @@
+from config import REQUIRED_CLAIM_COLUMNS
+
+
 def validate_claim_database(claim_data,data):
     print("\nValidating Claim Database......")
-    required_columns = [
-        "Claim ID",
-        "Claim",
-        "Intervention",
-        "Outcome",
-        "Population"
-    ]
+    required_columns = REQUIRED_CLAIM_COLUMNS
     print("\nMissing Values:")
     missing_values = claim_data[required_columns].isnull().sum()
     print(missing_values)

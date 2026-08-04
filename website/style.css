@@ -110,6 +110,7 @@ li a:hover{
     font-family: LexendExa, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color:#B84C65;
     font-weight: 400;
+    background: none;
 }
 .searchbar{
     display: flex;

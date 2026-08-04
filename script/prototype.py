@@ -4,13 +4,9 @@ from claim_loader import load_claim_database
 from validator import validate_database
 from claim_validator import validate_claim_database
 
-from quality_score import calculate_quality_score
-from claim_score import calculate_claim_score
-from interpretation import interpret_claim_score
-
 from grouping_claim import grouping_claim
-from claim_lookup import get_claim
 from claim_report import generate_claim_report
+from claim_evaluation import evaluate_claim
 
 
 def run_evidence_pipeline():
@@ -61,20 +57,11 @@ def run_evidence_pipeline():
 
         print("\n----------------------------")
         print("Evaluating:", claim_id)
-        # Score individual studies
-        study_scores = []
-        for _, study in studies.iterrows():
-            score = calculate_quality_score(
-                study
-            )
-            study_scores.append(score)
-        # Combine study scores into claim score
-        claim_score = calculate_claim_score(
-            study_scores
-        )
-        # Interpret confidence
-        confidence = interpret_claim_score(
-            claim_score
+        # Score individual studies, combine into a claim score,
+        # and interpret the confidence level
+        claim_score, confidence, study_scores = evaluate_claim(
+            claim,
+            studies
         )
         print(
             "Claim Score:",

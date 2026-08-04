@@ -15,6 +15,40 @@ The current prototype focuses on dietary supplement evidence.
 
 ---
 
+# How to Run (VS Code)
+
+## One-time setup (already done if you can see a `.venv` folder)
+
+```bash
+# From the project root:
+python3 -m venv .venv                # creates the project's own Python env
+.venv/bin/pip install -r requirements.txt
+```
+
+## Run the web app
+
+1. Open this folder in VS Code. It will automatically pick the `.venv` Python
+   (if not, click the interpreter in the bottom-right corner and choose the
+   one named `.venv`).
+2. Open `script/app.py` and press the ▶ **Run** button (or run
+   `.venv/bin/python script/app.py` in a terminal).
+3. Open http://localhost:5001 in your browser and search a claim ID, e.g. `C0001`.
+
+## Run the pipeline / CLI
+
+```bash
+.venv/bin/python script/prototype.py        # full claim evaluation pipeline
+.venv/bin/python script/user_interface.py    # interactive menu (search a claim)
+.venv/bin/python script/claim_test.py        # quick smoke tests
+```
+
+> **Why a venv?** Your Mac also ships a bare Python (`/usr/bin/python3`, v3.9.6)
+> that has **none** of this project's libraries. If VS Code ever uses it, every
+> script fails with `ModuleNotFoundError`. The `.venv` + `.vscode/settings.json`
+> in this repo make VS Code always use the correct Python.
+
+---
+
 # System Architecture
 
 Current data flow:

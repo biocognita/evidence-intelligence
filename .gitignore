@@ -4,6 +4,13 @@ credentials/
 # Python
 __pycache__/
 *.pyc
+.venv/
+
+# Local app data (Freebuff keeps this on this machine only)
+.freebuff/
+
+# VS Code local settings
+.vscode/
 
 # OS
 .DS_Store

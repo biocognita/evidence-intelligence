@@ -5,16 +5,17 @@
         <meta name="viewport" content="width=device-width">
         <title>Report</title>
         <link href="style.css" rel="stylesheet" type="text/css"/>
+    </head>
+
+    <body class="bodynorm">
+
         <nav class="navbar">
             <div class="logo">
                 <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognitalogo" class="logopic">
                 </a>Evidence Intelligence Project
             </div>
         </nav>
-    </head>
-    
-    <body class="bodynorm">
-        
+
         <div class="EvIntReport">
             <h1 id="claim"></h1>
 
@@ -37,6 +38,7 @@
             <h2>Study Breakdown</h2>
             <div id="breakdown"></div>
         </div>
+        <script src="api_config.js"></script>
         <script>
             async function loadReport() {
 
@@ -50,17 +52,28 @@
                     let response;
 
                     try {
-                        response = await fetch(`/claim/${claimId}`);
+                        // Always talk to the Flask backend (see api_config.js).
+                        // This also works when the page is opened directly as a
+                        // file or via a static preview — not just through the
+                        // Flask server itself.
+                        response = await fetch(`${API_BASE}/claim/${claimId}`);
                     } catch (err) {
                         document.body.innerHTML =
                             "<p>Couldn't reach the Evidence Intelligence server. " +
-                            "Make sure app.py is running on port 5001.</p>";
+                            "Make sure the server is running.</p>";
                         return;
                     }
 
                     if (!response.ok) {
-                        document.body.innerHTML =
-                            `<p>Claim ${claimId} not found.</p>`;
+                        if (response.status === 503) {
+                            // Server is up but couldn't load the Google Sheets data
+                            document.body.innerHTML =
+                                "<p>Database temporarily unavailable. " +
+                                "Please try again later.</p>";
+                        } else {
+                            document.body.innerHTML =
+                                `<p>Claim ${claimId} not found.</p>`;
+                        }
                         return;
                     }
 
