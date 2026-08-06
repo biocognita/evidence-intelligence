@@ -12,129 +12,271 @@
 body{
     margin:0px;
     padding:0;
-    background-color:#ffffff;
-    margin-left:30px;
-    margin-right: 30px;
+    margin-inline: auto;
+    background-color: #FFF5F3; /* Warmer, cozier background tint */
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(216, 226, 220, 0.4) 0%, transparent 40%), /* Soft Green Cell Blob */
+        radial-gradient(circle at 90% 80%, rgba(255, 202, 212, 0.4) 0%, transparent 40%); /* Soft Pink Cell Blob */
+    background-attachment: fixed;
+    --pink: #FFCAD4;
+    --beige: #FFE5D9;
+    --marron: #9D8189;
+    --green: #D8E2DC;
+    --red:#F4ACB7;
 }
-.bodynorm{
-    padding-top: 65px;
-}
-/*================All Pages=============*/
-/*Text Editing*/
-h1{
-    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 25px;
-    color: #B84C65;
-    font-weight:500;
-    background-color: #f5dddd;
-    padding:10px;
-    border-radius: 24px;
 
-}
-h2{
-    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color:#cc6b82;
-    font-weight:700;
-}
-h3{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color:#cc6b82;
-    font-weight: 600;
-    text-indent:10px;
-}
-p{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 14px;
-    text-indent: 10px;
-}
 /*NavBar&Logo*/
-.navbar{
-    display: flex;
-    justify-content: space-between;
+/* 1. The Navbar Track Layout */
+.navbar {
+    position: sticky;
+    top: 1.5rem;
+    width: 90%;
+    max-width: 75rem;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.75); /* Semi-transparent */
+    backdrop-filter: blur(12px); /* Creates the premium frosted glass texture */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 9999px;
+    border-bottom:  5px solid#F4ACB7;
+    box-shadow: 0 8px 32px rgba(157, 129, 137, 0.06); /* Lighter, cloudier shadow */
+}
+
+/* 2. The Brand Container (Logo + Text Wrapper) */
+.logo {
+    display: flex; /* Converts the block into a flexible horizontal row */
+    align-items: center; /* PERFECTLY centers the square logo image and text vertically */
+    gap: 0.75rem; /* Creates a clean, scalable cushion between logo and text */
+    padding: 0.15rem 1.5rem; /* Breathing room inside the capsule */
+    
+    /* Cute Branding Typography Rules */
+    font-family: sans-serif;
+    color: #9D8189; /* Your structural Marron color hex */
+    font-weight: 700; /* Crisp bold look */
+    font-size: 1.1rem;
+}
+
+/* 3. The Clickable Image Link Wrapper */
+.logo a {
+    display: flex; /* Ensures the anchor tag doesn't introduce text-alignment bugs */
     align-items: center;
-    width: 100%;
-    height: 60px;
-    padding: 0 20px;
-    box-sizing: border-box;
-    background-color: #FFF2FF;
-    box-shadow: 0 4px 6px rgba(20, 19, 19, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
 }
-.logo{
-    display: flex;
-    align-items: center;
-    font-family: LexendExa,'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color:#B84C65;
-   
+
+/* 4. The Square Logo Image Properties */
+.logopic {
+    max-height: 4rem; /* Limits size so it stays beautifully inside the nav pill */
+    width: auto; /* Maintains the square aspect ratio perfectly */
+    display: block; /* Erases old browser character baseline gaps */
+    
+    /* OPTIONAL: Nudge down further if the raw image file has uneven whitespace */
+    /* transform: translateY(2px); */
 }
-.logopic{
-    width:50px;
-    height:50px;
-    margin-right: 10px;
-}
-/*NavBar Links*/
-ul{
-    list-style-type: none;
-    margin:0;
-    padding:0;
-}
-li{
-    text-align: right;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-li a{
-    text-decoration: none;
-    color:#B84C65;
-}
-li a:hover{
-    color: #ffffff;
-    background-color:#cc6b82;
-    padding: 2px 10px;
-    border-radius: 4px;
-}
+
 /*=========HomePage*=============/
 /*Search Bar*/
-.searcharea{
-    padding: 5%;
-    background-color: rgb(246, 230, 231);
-    border-radius: 30px;
-    padding: 10px;
-    align-items: center;
-    padding-bottom:30px;
-}
-.searchtitle{
+/* 1. The Free-Floating Title (The Separator) */
+.searchtitle {
+    color: #5C4D51; /* Your structural Marron stands out beautifully alone */
+    font-size: 2.25rem;
+    font-family: LexendExa;
+    font-weight: 600;
     text-align: center;
-    margin-top: 80px;
-    font-family: LexendExa, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color:#B84C65;
-    font-weight: 400;
-    background: none;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.8);
+    
+    /* The Magic Spacing: Pushes down away from the nav bar, and pushes the card away below it */
+    margin-top: 6rem;    /* Buffer from the navigation bar */
+    margin-bottom: 0.5rem; /* Buffer before the search card arrives */
 }
-.searchbar{
+
+/* 2. The Main Search Wrapper Area */
+.searcharea {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 1.5rem; /* No top padding needed since the title handles the space! */
 }
-.searchbarbar{
-    width: 400px;
-    border-radius:24px;
-    padding-top:10px;
-    padding-bottom:10px;
-    border: 2px solid #cc6b82;
-    text-indent: 10px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+/* 3. The White Search Card (Now clean and tightly focused) */
+.searchbar {
+    padding: 1.25rem 2rem; /* Shrunk vertical padding completely to remove the bulky box feel */
+    width: 90%;
+    max-width: 44rem;
+    margin: 0 auto;
 }
-button{
-    border:none;
-    background: transparent;
+/* 4. The Internal Row Row Container */
+.searchbar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
 }
-.searchbutton{
-    width: 30px;
-    height: 30px;
+
+/* 5. The Pill Input Field */
+.searchbarbar {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    border: 2px solid #FFE5D9; /* Soft peach frame */
+    border-radius: 9999px;
+    font-size: 1rem;
+    color: #9D8189;
+    background-color: #FFFDFD;
+    outline: none;
+    transition: all 0.3s ease;
 }
+
+.searchbarbar:focus {
+    border-color: #F4ACB7;
+    box-shadow: 0 0 10px rgba(244, 172, 183, 0.2);
+}
+
+/* 6. The Circle Pink Button */
+/* 4. Add a cozy bounce response to your Pink Button */
+#search-button {
+    background-color: #FFCAD4;
+    border: none;
+    padding: 0.85rem; /* Made slightly larger to feel plush and round */
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 202, 212, 0.4); /* Pink glowing shadow under button */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth cartoon-like bounce */
+}
+
+#search-button:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 202, 212, 0.6);
+}
+
+.searchbutton {
+    height: 1.25rem;
+    width: auto;
+}
+
 /*=========Report Page=========*/
-.studyID{
-    font-weight:500;
+/* 1. Global Setup - Protects the layout even if JS deletes the container classes */
+.bodynorm, body {
+    background-color: #FFF5F3; /* Warm, cute background canvas */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #5C4D51; /* High-contrast dark plum-marron for perfect readability */
+    margin: 0;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 2. Style ANY raw error messages generated by the server crash code */
+body > p {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(157, 129, 137, 0.06);
+    border-left: 5px solid #F4ACB7; /* Soft red/pink warning border line */
+    font-size: 1.1rem;
+    font-weight: 500;
+    max-width: 35rem;
+    text-align: center;
+    margin-top: 4rem;
+}
+
+
+
+/* 4. The Parameter Card Framework */
+.EvIntReport {
+    width: 100%;
+    max-width: 44rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The Giant Claim Title: Floating completely naked with NO boxes */
+#claim {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #5C4D51;
+    margin: 2rem 0;
+    padding: 0;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+/* 5. Parameter Box - Upper Half (The Title Labels) */
+.EvIntReport h3 {
+    background-color: #FFFFFF; /* White card box starts here */
+    padding: 1.5rem 1.5rem 0.25rem 1.5rem;
+    margin: 0;
+    border-radius: 1.5rem 1.5rem 0 0; /* Rounds only the top corners */
+    
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9D8189; /* Light brand marron subtitle */
+}
+
+/* 6. Parameter Box - Lower Half (The Dynamic Data Strings) */
+.EvIntReport p {
+    background-color: #FFFFFF; /* Completes the white box layer */
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    
+    /* THE CRITICAL SPACER: Creates the box gap spacing BEFORE the next card starts */
+    margin: 0 0 1.5rem 0; 
+    
+    border-radius: 0 0 1.5rem 1.5rem; /* Rounds the bottom corners to complete the card */
+    box-shadow: 0 8px 30px rgba(157, 129, 137, 0.04); /* Cloud shadow */
+    
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #5C4D51;
+}
+
+/* 7. Clear Space Framework for the Study Breakdown Section at the bottom */
+.EvIntReport + div {
+    width: 100%;
+    max-width: 44rem;
+    margin-top: 2rem;
+}
+
+.EvIntReport + div h2 {
+    font-size: 1.5rem;
+    color: #5C4D51;
+    margin-bottom: 1.5rem;
+}
+
+/* Container for all study blocks */
+#breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;          /* Spaces the blocks apart nicely */
+    margin-top: 1rem;
+    max-width: 800px;     /* Keeps blocks readable and centered if needed */
+}
+
+/* Individual study block formatting */
+.study-card {
+    background-color: #ffffff;
+    border-radius: 12px;  /* Smooth, clean corners */
+    padding: 1.5rem;      /* Spacing inside the white block */
+    box-shadow: 0 4px 12px rgba(157, 128, 117, 0.1); /* Soft peachy/neutral shadow */
+    border-left: 5px solid #F4ACB7; /* Peachy accent line on the left edge */
+    transition: transform 0.2s ease;
+}
+
+/* Optional hover effect for the blocks */
+.study-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Heading for the Study ID inside the block */
+.studyID {
+    margin-top: 0;        /* Flushes the heading to the top of the block */
+    margin-bottom: 0.5rem;
+    color: #4A3E3D;       /* Deep neutral warm tone for contrast */
+    font-size: 1.25rem;
+}
+
+/* Score text inside the block */
+.study-score {
+    margin: 0;
+    color: #7A6B68;       /* Slightly lighter text for the secondary info */
+    font-size: 1rem;
 }

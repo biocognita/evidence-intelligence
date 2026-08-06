@@ -118,21 +118,29 @@
 
                 if (report.study_breakdown && report.study_breakdown.length > 0) {
                     report.study_breakdown.forEach((study) => {
+                        // Create a wrapper div block for this individual study
+                        const studyCard = document.createElement("div");
+                        studyCard.className = "study-card";
+
                         const idHeading = document.createElement("h3");
                         idHeading.className = "studyID";
                         idHeading.textContent = study.study_id;
 
                         const scoreLine = document.createElement("p");
-                        scoreLine.textContent =
-                            `Quality Score: ${study.quality_score}`;
+                        scoreLine.className = "study-score";
+                        scoreLine.textContent = `Quality Score: ${study.quality_score}/100`;
 
-                        breakdownContainer.appendChild(idHeading);
-                        breakdownContainer.appendChild(scoreLine);
+                        // Append the text elements into the white card block
+                        studyCard.appendChild(idHeading);
+                        studyCard.appendChild(scoreLine);
+
+                        // Append the finished card block into the main layout container
+                        breakdownContainer.appendChild(studyCard);
                     });
                 } else {
-                    breakdownContainer.textContent =
-                        "No study breakdown available.";
+                    breakdownContainer.textContent = "No study breakdown available.";
                 }
+
             }
 
             loadReport();

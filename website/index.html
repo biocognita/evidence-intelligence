@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Evidence Intelligence Project</title>
-        <link href="style.css" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=1" rel="stylesheet" type="text/css"/>
     </head>
     <body>
         <nav class="navbar">
@@ -14,24 +14,31 @@
             </div>
         </nav>
 
-        <div class="searcharea">
-            <h1 class="searchtitle">Search Your ID here</h1>
-            <div class="searchbar">
-                <input
-                    id="claim-input"
-                    type="search"
-                    placeholder="Search Claim ID..."
-                    class="searchbarbar"
-                >
-                <button id="search-button" type="button">
+        <!-- The Free-Floating Separator Title -->
+
+        <h1 class="searchtitle">Start here...</h1>
+
+<!-- The Clean Search Card Block below it -->
+<div class="searcharea">
+    <div class="searchbar">
+        <div class="searchbar-row">
+            <input
+                id="claim-input"
+                type="search"
+                placeholder="Search Claim ID..."
+                class="searchbarbar"
+            >
+            <button id="search-button" type="button">
                 <img
                     src="assets/images/searchicon.png"
                     alt="searchbutton"
                     class="searchbutton"
                 >
-                </button>
-            </div>
+            </button>
         </div>
+    </div>
+</div>
+
 
         <script src="scripts.js"></script>
     </body>
