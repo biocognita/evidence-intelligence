@@ -1,0 +1,23 @@
+# Render Blueprint for the Evidence Intelligence web app.
+#
+# This file pins the deployment configuration in-repo so that (re)importing
+# the repository into Render always picks the correct root directory, build
+# command and start command — no more guesswork / root directory mismatch.
+#
+# Layout assumptions:
+#   - requirements.txt lives at the repo root (so rootDir is the repo root)
+#   - the Flask app is script/app.py and needs script/ on sys.path, so gunicorn
+#     chdirs into script/ before importing `app`
+#   - the static frontend lives in website/ and is served by Flask itself
+services:
+  - type: web
+    name: evidence-intelligence
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --chdir script app:app
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+    autoDeploy: true
