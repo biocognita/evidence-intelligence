@@ -248,6 +248,40 @@ body {
     border: 1px solid #EAE4DC;
 }
 
+/* ============ Contact Us card ============ */
+
+.contact-card p {
+    margin-bottom: 1.4rem;
+}
+
+.contact-card p:last-child {
+    margin-bottom: 0;
+}
+
+.contact-email {
+    margin: 0;
+}
+
+/* Email as a warm pink pill — matches the search button + header */
+.contact-mailto {
+    display: inline-block;
+    padding: 0.75rem 1.8rem;
+    border-radius: 9999px;
+    background-color: var(--header-pink);
+    color: var(--ink);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem; /* body */
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.contact-mailto:hover {
+    transform: translateY(-2px);
+    background-color: var(--title-pink);
+    box-shadow: 0 6px 16px rgba(224, 136, 136, 0.35);
+}
+
 /* ============ Scroll reveal (About Us / Methodology) ============ */
 
 .reveal {
