@@ -301,10 +301,22 @@ body{
     font-weight: 700;
 }
 
+/* Action buttons row (Refresh + Load more) under the results grid */
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem auto 0;
+    max-width: 68rem;
+}
+
+.results-actions .load-more {
+    margin: 0;
+}
+
 /* Load-more pagination button under the grid */
 .load-more {
-    display: block;
-    margin: 2rem auto;
+    display: inline-block;
     padding: 0.85rem 2.5rem;
     background-color: #FFCAD4;
     color: #7A5A62;
@@ -322,7 +334,29 @@ body{
     box-shadow: 0 6px 20px rgba(255, 202, 212, 0.6);
 }
 
-.load-more[hidden] {
+/* Manual refresh button (bypasses the browser cache) */
+.refresh-btn {
+    display: inline-block;
+    padding: 0.85rem 1.8rem;
+    background-color: #FFFFFF;
+    color: #9D8189;
+    font-size: 1rem;
+    font-weight: 700;
+    border: 2px solid #FFE5D9;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(157, 129, 137, 0.1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.refresh-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    border-color: #F4ACB7;
+    box-shadow: 0 6px 20px rgba(244, 172, 183, 0.35);
+}
+
+.load-more[hidden],
+.refresh-btn[hidden] {
     display: none;
 }
 

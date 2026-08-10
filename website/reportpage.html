@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Report</title>
-        <link href="style.css" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=6" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -39,82 +39,43 @@
             <div id="breakdown"></div>
         </div>
         <script src="api_config.js"></script>
+        <script src="cache_utils.js"></script>
         <script>
-            async function loadReport() {
+            const CACHE_PREFIX = "evint_report";
+            let query = "";
 
-                const params = new URLSearchParams(window.location.search);
-                const claimId = params.get("claim");
+            function reportCacheKey(claimId) {
+                return cacheKey(CACHE_PREFIX, claimId);
+            }
 
-                let report;
+            // Fill every section of the report page. When `fromCache` is
+            // true the "(cached)" suffix is appended to the score.
+            function renderReport(report, fromCache) {
+                const claimEl = document.getElementById("claim");
+                const populationEl = document.getElementById("population");
+                const interventionEl = document.getElementById("intervention");
 
-                if (claimId) {
-                    // Direct link, e.g. reportpage.html?claim=C0001
-                    let response;
+                // Highlight the search query in the free-text fields (safe:
+                // highlightText builds text nodes + <mark>, never HTML).
+                claimEl.textContent = "";
+                claimEl.appendChild(highlightText(report.claim || "", query));
+                populationEl.textContent = "";
+                populationEl.appendChild(highlightText(report.population || "", query));
+                interventionEl.textContent = "";
+                interventionEl.appendChild(highlightText(report.intervention || "", query));
 
-                    try {
-                        // Always talk to the Flask backend (see api_config.js).
-                        // This also works when the page is opened directly as a
-                        // file or via a static preview — not just through the
-                        // Flask server itself.
-                        response = await fetch(`${API_BASE}/claim/${claimId}`);
-                    } catch (err) {
-                        document.body.innerHTML =
-                            "<p>Couldn't reach the Evidence Intelligence server. " +
-                            "Make sure the server is running.</p>";
-                        return;
-                    }
-
-                    if (!response.ok) {
-                        if (response.status === 503) {
-                            // Server is up but couldn't load the Google Sheets data
-                            document.body.innerHTML =
-                                "<p>Database temporarily unavailable. " +
-                                "Please try again later.</p>";
-                        } else {
-                            document.body.innerHTML =
-                                `<p>Claim ${claimId} not found.</p>`;
-                        }
-                        return;
-                    }
-
-                    report = await response.json();
-
-                    // Keep localStorage in sync so refreshing still works
-                    localStorage.setItem("report", JSON.stringify(report));
-
-                } else {
-                    // Fallback: came here via the search box on index.html
-                    const stored = localStorage.getItem("report");
-
-                    if (!stored) {
-                        document.body.innerHTML =
-                            "<p>No report to show. " +
-                            "<a href=\"index.html\">Search for a claim</a>.</p>";
-                        return;
-                    }
-
-                    report = JSON.parse(stored);
-                }
-
-                document.getElementById("claim").textContent =
-                    report.claim;
-
-                document.getElementById("population").textContent =
-                    report.population;
-
-                document.getElementById("intervention").textContent =
-                    report.intervention;
-
+                const scoreSuffix = fromCache ? " (cached)" : "";
                 document.getElementById("score").textContent =
-                    report.confidence_score + "/100";
+                    report.confidence_score + "/100" + scoreSuffix;
 
                 document.getElementById("strength").textContent =
                     report.evidence_strength;
 
                 document.getElementById("studies").textContent =
-                    report.supporting_studies.join(", ");
+                    (report.supporting_studies || []).join(", ");
 
                 const breakdownContainer = document.getElementById("breakdown");
+                breakdownContainer.innerHTML = "";
 
                 if (report.study_breakdown && report.study_breakdown.length > 0) {
                     report.study_breakdown.forEach((study) => {
@@ -140,7 +101,74 @@
                 } else {
                     breakdownContainer.textContent = "No study breakdown available.";
                 }
+            }
 
+            async function loadReport() {
+
+                const params = new URLSearchParams(window.location.search);
+                const claimId = params.get("claim");
+                query = (params.get("q") || "").trim();
+
+                let report;
+
+                if (claimId) {
+                    const normalized = claimId.trim().toUpperCase();
+
+                    // Cache hit: render instantly, skip the network round-trip
+                    if (!params.get("fresh")) {
+                        const cached = readCache(reportCacheKey(normalized));
+                        if (cached) {
+                            renderReport(cached, true);
+                            return;
+                        }
+                    }
+
+                    // Direct link, e.g. reportpage.html?claim=C0001
+                    let response;
+                    try {
+                        // Always talk to the Flask backend (see api_config.js).
+                        // This also works when the page is opened directly as a
+                        // file or via a static preview — not just through the
+                        // Flask server itself.
+                        response = await fetch(`${API_BASE}/claim/${normalized}`);
+                    } catch (err) {
+                        document.body.innerHTML =
+                            "<p>Couldn't reach the Evidence Intelligence server. " +
+                            "Make sure the server is running.</p>";
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        if (response.status === 503) {
+                            // Server is up but couldn't load the Google Sheets data
+                            document.body.innerHTML =
+                                "<p>Database temporarily unavailable. " +
+                                "Please try again later.</p>";
+                        } else {
+                            document.body.innerHTML =
+                                `<p>Claim ${normalized} not found.</p>`;
+                        }
+                        return;
+                    }
+
+                    report = await response.json();
+                    writeCache(reportCacheKey(normalized), report);
+
+                } else {
+                    // Fallback: came here via the search box on index.html
+                    const stored = localStorage.getItem("report");
+
+                    if (!stored) {
+                        document.body.innerHTML =
+                            "<p>No report to show. " +
+                            "<a href=\"index.html\">Search for a claim</a>.</p>";
+                        return;
+                    }
+
+                    report = JSON.parse(stored);
+                }
+
+                renderReport(report, false);
             }
 
             loadReport();

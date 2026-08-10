@@ -47,17 +47,18 @@
 
         <div id="results" class="results-area"></div>
 
-        <button id="load-more" class="load-more" type="button" hidden>Load more results</button>
+        <div class="results-actions">
+            <button id="refresh" class="refresh-btn" type="button" hidden>↻ Refresh results</button>
+            <button id="load-more" class="load-more" type="button" hidden>Load more results</button>
+        </div>
 
         <script src="api_config.js"></script>
         <script src="scripts.js"></script>
+        <script src="cache_utils.js"></script>
         <script>
             const SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"];
             const PAGE_SIZE = 20;
-            // Browser cache lives for 5 minutes, mirroring the server-side
-            // TTL, so revisiting a query renders instantly from localStorage.
-            const CACHE_TTL_MS = 5 * 60 * 1000;
-            const CACHE_PREFIX = "evint_search:";
+            const CACHE_PREFIX = "evint_search";
 
             let currentQuery = "";
             let currentColumn = "Claim";
@@ -68,49 +69,18 @@
             // query+column; persisted to localStorage after each fetch.
             let cachedResults = [];
 
-            // ----- localStorage cache helpers (best-effort) -----
-            function cacheKey(query, column) {
-                return `${CACHE_PREFIX}${query.toLowerCase()}|${column}`;
+            function searchCacheKey() {
+                return cacheKey(CACHE_PREFIX, currentQuery, currentColumn);
             }
 
-            function readCache(query, column) {
-                try {
-                    const raw = localStorage.getItem(cacheKey(query, column));
-                    if (!raw) {
-                        return null;
-                    }
-                    const entry = JSON.parse(raw);
-                    if (!entry || typeof entry.fetched_at !== "number") {
-                        return null;
-                    }
-                    if (Date.now() - entry.fetched_at > CACHE_TTL_MS) {
-                        return null;
-                    }
-                    return entry;
-                } catch (err) {
-                    return null; // storage unavailable — just fetch
-                }
-            }
-
-            function writeCache(query, column, total, results) {
-                try {
-                    localStorage.setItem(cacheKey(query, column), JSON.stringify({
-                        fetched_at: Date.now(),
-                        total: total,
-                        results: results
-                    }));
-                } catch (err) {
-                    // Quota exceeded / disabled — caching is best-effort
-                }
-            }
-
-            // Shared rendering: appends cards, updates status + load-more.
+            // Shared rendering: appends cards, updates status + buttons.
             // Used by both the cache-hit and network paths so they can
             // never drift out of sync.
             function renderResults(results, total, fromCache) {
                 const status = document.getElementById("results-status");
                 const container = document.getElementById("results");
                 const loadMoreBtn = document.getElementById("load-more");
+                const refreshBtn = document.getElementById("refresh");
 
                 const shown = currentOffset + results.length;
                 const suffix = fromCache ? " (cached)" : "";
@@ -126,35 +96,7 @@
                 hasMore = shown < total;
                 loadMoreBtn.hidden = !hasMore;
                 loadMoreBtn.textContent = "Load more results";
-            }
-
-            // ----- XSS-safe match highlighting -----
-            // Splits the text into plain text nodes and <mark> elements, so
-            // sheet content can never be injected as HTML.
-            function highlightText(text, query) {
-                const frag = document.createDocumentFragment();
-                if (!query || !text) {
-                    frag.appendChild(document.createTextNode(text || ""));
-                    return frag;
-                }
-                const lowerText = text.toLowerCase();
-                const lowerQuery = query.toLowerCase();
-                let start = 0;
-                let index;
-                while ((index = lowerText.indexOf(lowerQuery, start)) !== -1) {
-                    if (index > start) {
-                        frag.appendChild(document.createTextNode(text.slice(start, index)));
-                    }
-                    const mark = document.createElement("mark");
-                    mark.className = "match-highlight";
-                    mark.textContent = text.slice(index, index + query.length);
-                    frag.appendChild(mark);
-                    start = index + query.length;
-                }
-                if (start < text.length) {
-                    frag.appendChild(document.createTextNode(text.slice(start)));
-                }
-                return frag;
+                refreshBtn.hidden = false;
             }
 
             function renderStudyBreakdown(breakdown) {
@@ -181,7 +123,10 @@
             function renderResultCard(claim) {
                 const card = document.createElement("a");
                 card.className = "result-card";
-                card.href = `reportpage.html?claim=${encodeURIComponent(claim["Claim ID"])}`;
+                // Carry the query along so the report page can highlight
+                // the same matches.
+                card.href = `reportpage.html?claim=${encodeURIComponent(claim["Claim ID"])}` +
+                    `&q=${encodeURIComponent(currentQuery)}`;
 
                 const idLine = document.createElement("div");
                 idLine.className = "result-id";
@@ -246,6 +191,7 @@
                     currentOffset = 0;
                     hasMore = false;
                     cachedResults = [];
+                    document.getElementById("refresh").hidden = true;
 
                     // Prefill the search box + column picker so users can refine
                     document.getElementById("claim-input").value = currentQuery;
@@ -264,8 +210,8 @@
                     status.textContent = "Searching…";
 
                     // Cache hit: render instantly, skip the network round-trip
-                    const cached = readCache(currentQuery, currentColumn);
-                    if (cached) {
+                    const cached = readCache(searchCacheKey());
+                    if (cached && !params.get("fresh")) {
                         // Guard against corrupt storage: only accept arrays
                         cachedResults = Array.isArray(cached.results) ? cached.results : [];
                         renderResults(cachedResults, cached.total, true);
@@ -308,13 +254,26 @@
 
                 // Extend + persist the accumulated result cache, then render
                 cachedResults = cachedResults.concat(payload.results);
-                writeCache(currentQuery, currentColumn, payload.total, cachedResults);
+                writeCache(searchCacheKey(), {
+                    total: payload.total,
+                    results: cachedResults
+                });
                 renderResults(payload.results, payload.total, false);
                 isLoading = false;
             }
 
             document.getElementById("load-more").addEventListener("click", () => {
                 loadSearchResults(false);
+            });
+
+            // Manual refresh: drop the cached entry and re-fetch fresh data.
+            // ?fresh=1 also bypasses the cache on page load (used here and
+            // available as a URL shortcut).
+            document.getElementById("refresh").addEventListener("click", () => {
+                clearCache(searchCacheKey());
+                const url = new URL(window.location.href);
+                url.searchParams.set("fresh", "1");
+                window.location.href = url.toString();
             });
 
             loadSearchResults(true);
