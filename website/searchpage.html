@@ -104,6 +104,30 @@
                 }
             }
 
+            // Shared rendering: appends cards, updates status + load-more.
+            // Used by both the cache-hit and network paths so they can
+            // never drift out of sync.
+            function renderResults(results, total, fromCache) {
+                const status = document.getElementById("results-status");
+                const container = document.getElementById("results");
+                const loadMoreBtn = document.getElementById("load-more");
+
+                const shown = currentOffset + results.length;
+                const suffix = fromCache ? " (cached)" : "";
+                status.textContent =
+                    `Showing ${shown} of ${total} claim${total === 1 ? "" : "s"} ` +
+                    `matching “${currentQuery}” in ${currentColumn}:${suffix}`;
+
+                results.forEach((claim) => {
+                    container.appendChild(renderResultCard(claim));
+                });
+
+                currentOffset = shown;
+                hasMore = shown < total;
+                loadMoreBtn.hidden = !hasMore;
+                loadMoreBtn.textContent = "Load more results";
+            }
+
             // ----- XSS-safe match highlighting -----
             // Splits the text into plain text nodes and <mark> elements, so
             // sheet content can never be injected as HTML.
@@ -242,18 +266,9 @@
                     // Cache hit: render instantly, skip the network round-trip
                     const cached = readCache(currentQuery, currentColumn);
                     if (cached) {
-                        cachedResults = cached.results || [];
-                        const shown = cachedResults.length;
-                        status.textContent =
-                            `Showing ${shown} of ${cached.total} claim${cached.total === 1 ? "" : "s"} ` +
-                            `matching “${currentQuery}” in ${currentColumn} (cached):`;
-                        cachedResults.forEach((claim) => {
-                            container.appendChild(renderResultCard(claim));
-                        });
-                        currentOffset = shown;
-                        hasMore = shown < cached.total;
-                        loadMoreBtn.hidden = !hasMore;
-                        loadMoreBtn.textContent = "Load more results";
+                        // Guard against corrupt storage: only accept arrays
+                        cachedResults = Array.isArray(cached.results) ? cached.results : [];
+                        renderResults(cachedResults, cached.total, true);
                         isLoading = false;
                         return;
                     }
@@ -291,23 +306,10 @@
                     return;
                 }
 
-                const shown = currentOffset + payload.results.length;
-                status.textContent =
-                    `Showing ${shown} of ${payload.total} claim${payload.total === 1 ? "" : "s"} ` +
-                    `matching “${currentQuery}” in ${currentColumn}:`;
-
-                payload.results.forEach((claim) => {
-                    container.appendChild(renderResultCard(claim));
-                });
-
-                // Extend + persist the accumulated result cache
+                // Extend + persist the accumulated result cache, then render
                 cachedResults = cachedResults.concat(payload.results);
                 writeCache(currentQuery, currentColumn, payload.total, cachedResults);
-
-                hasMore = payload.has_more;
-                currentOffset = shown;
-                loadMoreBtn.hidden = !hasMore;
-                loadMoreBtn.textContent = "Load more results";
+                renderResults(payload.results, payload.total, false);
                 isLoading = false;
             }
 
