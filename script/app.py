@@ -59,13 +59,14 @@ def report_page():
     return send_from_directory(WEBSITE_DIR, "reportpage.html")
 
 
-# Column searched by /search when none is given (?col=). The front end
-# offers a picker, so this is just the default.
-SEARCH_COLUMN = "Claim"
-
 # Columns users may search via ?col=. Kept explicit so the front-end
-# dropdown always matches what the backend will accept.
+# always matches what the backend will accept.
 SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"]
+
+# A bare query (?q= without ?col=) matches ANY of these text fields, so
+# "melatonin" finds the claim, and "1683" finds claims citing studies
+# with that sample size. The claim ID itself is included.
+ALL_FIELDS_COLUMNS = ["Claim ID"] + SEARCHABLE_COLUMNS
 
 # Pagination defaults for /search so huge result sets are never all
 # serialized in one response.
@@ -102,10 +103,14 @@ def search_claims():
     if not query:
         return jsonify({"error": "Missing query parameter: ?q=<text>"}), 400
 
-    # Validate the requested column; fall back to the default if absent or
-    # not in the whitelist (never trust client input blindly).
+    # Validate the requested column. If ?col= is missing or names a column
+    # we don't know, search across ALL text fields (never trust client
+    # input blindly — fall back to the broad search, not to nothing).
     requested_col = (request.args.get("col") or "").strip()
-    search_column = requested_col if requested_col in SEARCHABLE_COLUMNS else SEARCH_COLUMN
+    if requested_col in SEARCHABLE_COLUMNS:
+        search_column = requested_col
+    else:
+        search_column = "All fields"
 
     # Pagination: clamp so a huge or negative limit can't blow up memory.
     limit = _clamp_int(request.args.get("limit"), SEARCH_DEFAULT_LIMIT, 1, SEARCH_MAX_LIMIT)
@@ -127,11 +132,23 @@ def search_claims():
     # searched column is a low-cardinality column (compressed to category
     # dtype), and regex=False treats the query as literal text (a query
     # like "C+" must not be interpreted as a regular expression).
-    matched = claims[
-        claims[search_column]
-        .astype("string")
-        .str.contains(query, case=False, na=False, regex=False)
-    ]
+    if search_column == "All fields":
+        # OR together matches from every searchable text column.
+        masks = [
+            claims[col].astype("string").str.contains(query, case=False, na=False, regex=False)
+            for col in ALL_FIELDS_COLUMNS
+        ]
+        mask = masks[0]
+        for other in masks[1:]:
+            mask = mask | other
+        matched = claims[mask]
+        del masks
+    else:
+        matched = claims[
+            claims[search_column]
+            .astype("string")
+            .str.contains(query, case=False, na=False, regex=False)
+        ]
 
     total = len(matched)
 

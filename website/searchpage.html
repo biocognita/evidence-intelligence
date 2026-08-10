@@ -30,7 +30,7 @@
                         <input
                             id="claim-input"
                             type="search"
-                            placeholder="Search for a claim..."
+                            placeholder="Search claim IDs, claims, interventions, outcomes, or populations..."
                             class="searchbarbar"
                         >
                         <button id="search-button" type="button">
@@ -63,7 +63,9 @@
             const CACHE_PREFIX = "evint_search";
 
             let currentQuery = "";
-            let currentColumn = "Claim";
+            // "All fields" = no ?col= sent; the backend searches every
+            // searchable text column (claim, claim ID, intervention, etc.).
+            let currentColumn = "All fields";
             let currentOffset = 0;
             let hasMore = false;
             let isLoading = false;
@@ -196,7 +198,7 @@
                     currentQuery = (params.get("q") || "").trim();
                     currentColumn = SEARCHABLE_COLUMNS.includes(params.get("col"))
                         ? params.get("col")
-                        : "Claim";
+                        : "All fields";
                     currentOffset = 0;
                     hasMore = false;
                     cachedResults = [];
@@ -234,10 +236,14 @@
                 try {
                     const searchParams = new URLSearchParams({
                         q: currentQuery,
-                        col: currentColumn,
                         limit: String(PAGE_SIZE),
                         offset: String(currentOffset)
                     });
+                    // Only pin a specific column when the URL asked for one;
+                    // otherwise let the backend search all fields.
+                    if (currentColumn !== "All fields") {
+                        searchParams.set("col", currentColumn);
+                    }
                     const response = await fetch(`${API_BASE}/search?${searchParams.toString()}`);
                     if (!response.ok) {
                         throw new Error(`Search failed (HTTP ${response.status})`);

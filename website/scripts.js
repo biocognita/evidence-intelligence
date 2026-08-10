@@ -47,16 +47,14 @@ function searchClaim() {
         return;
     }
 
-    const columnSelect = document.getElementById("search-column");
-    const column = columnSelect ? columnSelect.value : "Claim";
-
     // A claim ID (e.g. C0001 or c0001) jumps straight to its report.
     if (/^c[0-9]{4}$/i.test(query)) {
         window.location.href = `reportpage.html?claim=${query.toUpperCase()}`;
         return;
     }
 
-    // Anything else is free-text search against the selected column.
-    const params = new URLSearchParams({ q: query, col: column });
+    // Anything else is a free-text search across ALL fields (claim,
+    // claim ID, intervention, outcome, population).
+    const params = new URLSearchParams({ q: query });
     window.location.href = `searchpage.html?${params.toString()}`;
 }
