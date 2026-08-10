@@ -124,7 +124,10 @@ def search_claims():
     for record in results:
         claim_id = record.get("Claim ID")
         try:
-            studies = data["study_by_claim"].loc[claim_id]
+            # .loc[[claim_id]] (double brackets) always yields a DataFrame,
+            # even for claims with exactly one study (.loc[claim_id] would
+            # return a bare Series and break vectorized scoring).
+            studies = data["study_by_claim"].loc[[claim_id]]
         except KeyError:
             continue
         try:
@@ -170,7 +173,10 @@ def get_claim_report(claim_id):
         return jsonify({"error": f"Claim {claim_id} not found"}), 404
 
     try:
-        studies = data["study_by_claim"].loc[claim_id]
+        # .loc[[claim_id]] (double brackets) always yields a DataFrame,
+        # even for claims with exactly one study (.loc[claim_id] would
+        # return a bare Series and break vectorized scoring).
+        studies = data["study_by_claim"].loc[[claim_id]]
     except KeyError:
         studies = data["study_data"].iloc[0:0]
 
