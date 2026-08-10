@@ -292,6 +292,15 @@ body{
     color: #B9A6AC;
 }
 
+/* Highlighted search match inside result cards */
+.match-highlight {
+    background-color: #FFCAD4;
+    color: #7A5A62;
+    border-radius: 4px;
+    padding: 0 0.15rem;
+    font-weight: 700;
+}
+
 /* Load-more pagination button under the grid */
 .load-more {
     display: block;

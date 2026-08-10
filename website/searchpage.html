@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Search Results - Evidence Intelligence</title>
-        <link href="style.css?v=4" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=5" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -54,12 +54,84 @@
         <script>
             const SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"];
             const PAGE_SIZE = 20;
+            // Browser cache lives for 5 minutes, mirroring the server-side
+            // TTL, so revisiting a query renders instantly from localStorage.
+            const CACHE_TTL_MS = 5 * 60 * 1000;
+            const CACHE_PREFIX = "evint_search:";
 
             let currentQuery = "";
             let currentColumn = "Claim";
             let currentOffset = 0;
             let hasMore = false;
             let isLoading = false;
+            // Accumulates every result page fetched so far for the current
+            // query+column; persisted to localStorage after each fetch.
+            let cachedResults = [];
+
+            // ----- localStorage cache helpers (best-effort) -----
+            function cacheKey(query, column) {
+                return `${CACHE_PREFIX}${query.toLowerCase()}|${column}`;
+            }
+
+            function readCache(query, column) {
+                try {
+                    const raw = localStorage.getItem(cacheKey(query, column));
+                    if (!raw) {
+                        return null;
+                    }
+                    const entry = JSON.parse(raw);
+                    if (!entry || typeof entry.fetched_at !== "number") {
+                        return null;
+                    }
+                    if (Date.now() - entry.fetched_at > CACHE_TTL_MS) {
+                        return null;
+                    }
+                    return entry;
+                } catch (err) {
+                    return null; // storage unavailable — just fetch
+                }
+            }
+
+            function writeCache(query, column, total, results) {
+                try {
+                    localStorage.setItem(cacheKey(query, column), JSON.stringify({
+                        fetched_at: Date.now(),
+                        total: total,
+                        results: results
+                    }));
+                } catch (err) {
+                    // Quota exceeded / disabled — caching is best-effort
+                }
+            }
+
+            // ----- XSS-safe match highlighting -----
+            // Splits the text into plain text nodes and <mark> elements, so
+            // sheet content can never be injected as HTML.
+            function highlightText(text, query) {
+                const frag = document.createDocumentFragment();
+                if (!query || !text) {
+                    frag.appendChild(document.createTextNode(text || ""));
+                    return frag;
+                }
+                const lowerText = text.toLowerCase();
+                const lowerQuery = query.toLowerCase();
+                let start = 0;
+                let index;
+                while ((index = lowerText.indexOf(lowerQuery, start)) !== -1) {
+                    if (index > start) {
+                        frag.appendChild(document.createTextNode(text.slice(start, index)));
+                    }
+                    const mark = document.createElement("mark");
+                    mark.className = "match-highlight";
+                    mark.textContent = text.slice(index, index + query.length);
+                    frag.appendChild(mark);
+                    start = index + query.length;
+                }
+                if (start < text.length) {
+                    frag.appendChild(document.createTextNode(text.slice(start)));
+                }
+                return frag;
+            }
 
             function renderStudyBreakdown(breakdown) {
                 const wrapper = document.createElement("div");
@@ -100,10 +172,12 @@
                     scoreLine.textContent = "No score available";
                 }
 
+                // Claim text with the matching substring highlighted
                 const claimLine = document.createElement("div");
                 claimLine.className = "result-claim";
-                claimLine.textContent = claim["Claim"] || "";
+                claimLine.appendChild(highlightText(claim["Claim"] || "", currentQuery));
 
+                // Meta line: also highlight the query wherever it appears
                 const metaLine = document.createElement("div");
                 metaLine.className = "result-meta";
                 const meta = [
@@ -111,7 +185,8 @@
                     claim["Outcome"],
                     claim["Population"]
                 ].filter(Boolean);
-                metaLine.textContent = meta.join(" · ") || "No details available";
+                const metaText = meta.join(" · ") || "No details available";
+                metaLine.appendChild(highlightText(metaText, currentQuery));
 
                 card.appendChild(idLine);
                 card.appendChild(scoreLine);
@@ -136,6 +211,8 @@
                 }
 
                 const params = new URLSearchParams(window.location.search);
+                const status = document.getElementById("results-status");
+                const container = document.getElementById("results");
 
                 if (reset) {
                     currentQuery = (params.get("q") || "").trim();
@@ -143,26 +220,43 @@
                         ? params.get("col")
                         : "Claim";
                     currentOffset = 0;
+                    hasMore = false;
+                    cachedResults = [];
 
                     // Prefill the search box + column picker so users can refine
                     document.getElementById("claim-input").value = currentQuery;
                     document.getElementById("search-column").value = currentColumn;
-                }
 
-                const status = document.getElementById("results-status");
-                const container = document.getElementById("results");
+                    if (!currentQuery) {
+                        status.textContent =
+                            "Type a keyword above to search the claim database.";
+                        loadMoreBtn.hidden = true;
+                        isLoading = false;
+                        loadMoreBtn.textContent = "Load more results";
+                        return;
+                    }
 
-                if (!currentQuery) {
-                    status.textContent =
-                        "Type a keyword above to search the claim database.";
-                    loadMoreBtn.hidden = true;
-                    isLoading = false;
-                    loadMoreBtn.textContent = "Load more results";
-                    return;
-                }
-
-                if (reset) {
+                    container.innerHTML = "";
                     status.textContent = "Searching…";
+
+                    // Cache hit: render instantly, skip the network round-trip
+                    const cached = readCache(currentQuery, currentColumn);
+                    if (cached) {
+                        cachedResults = cached.results || [];
+                        const shown = cachedResults.length;
+                        status.textContent =
+                            `Showing ${shown} of ${cached.total} claim${cached.total === 1 ? "" : "s"} ` +
+                            `matching “${currentQuery}” in ${currentColumn} (cached):`;
+                        cachedResults.forEach((claim) => {
+                            container.appendChild(renderResultCard(claim));
+                        });
+                        currentOffset = shown;
+                        hasMore = shown < cached.total;
+                        loadMoreBtn.hidden = !hasMore;
+                        loadMoreBtn.textContent = "Load more results";
+                        isLoading = false;
+                        return;
+                    }
                 }
 
                 let payload;
@@ -188,10 +282,6 @@
                     return;
                 }
 
-                if (reset) {
-                    container.innerHTML = "";
-                }
-
                 if (payload.total === 0) {
                     status.textContent =
                         `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`;
@@ -209,6 +299,10 @@
                 payload.results.forEach((claim) => {
                     container.appendChild(renderResultCard(claim));
                 });
+
+                // Extend + persist the accumulated result cache
+                cachedResults = cachedResults.concat(payload.results);
+                writeCache(currentQuery, currentColumn, payload.total, cachedResults);
 
                 hasMore = payload.has_more;
                 currentOffset = shown;
