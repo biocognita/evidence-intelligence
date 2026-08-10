@@ -153,6 +153,9 @@
 
                     report = await response.json();
                     writeCache(reportCacheKey(normalized), report);
+                    // Keep the legacy key in sync so the no-claim-param
+                    // fallback branch (old search-box flow) still works.
+                    localStorage.setItem("report", JSON.stringify(report));
 
                 } else {
                     // Fallback: came here via the search box on index.html
