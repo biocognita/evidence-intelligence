@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=17" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=18" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -25,11 +25,68 @@
         </nav>
 
         <main class="report-main">
-            <h1 id="claim"></h1>
 
-            <h2 class="report-section-title">Overview</h2>
+            <!-- Skeleton screen: mirrors the report layout while loading -->
+            <div id="report-skeleton" aria-hidden="true">
+                <div class="sk sk-title"></div>
 
-            <div class="report-grid">
+                <div class="sk sk-section"></div>
+
+                <div class="sk-grid">
+                    <div class="sk-card">
+                        <div class="sk sk-line"></div>
+                        <div class="sk sk-line-value"></div>
+                    </div>
+                    <div class="sk-card">
+                        <div class="sk sk-line"></div>
+                        <div class="sk sk-line-value"></div>
+                    </div>
+                    <div class="sk-card">
+                        <div class="sk sk-line"></div>
+                        <div class="sk sk-line-value"></div>
+                    </div>
+                    <div class="sk-card">
+                        <div class="sk sk-line"></div>
+                        <div class="sk sk-line-value"></div>
+                    </div>
+                    <div class="sk-card sk-card-full">
+                        <div class="sk sk-line"></div>
+                        <div class="sk sk-line-value wide"></div>
+                    </div>
+                </div>
+
+                <div class="sk sk-section"></div>
+
+                <div class="sk-studies">
+                    <div class="sk-study">
+                        <div class="sk-study-header">
+                            <div class="sk sk-study-id"></div>
+                            <div class="sk sk-study-badge"></div>
+                        </div>
+                        <div class="sk sk-study-summary"></div>
+                    </div>
+                    <div class="sk-study">
+                        <div class="sk-study-header">
+                            <div class="sk sk-study-id"></div>
+                            <div class="sk sk-study-badge"></div>
+                        </div>
+                        <div class="sk sk-study-summary"></div>
+                    </div>
+                    <div class="sk-study">
+                        <div class="sk-study-header">
+                            <div class="sk sk-study-id"></div>
+                            <div class="sk sk-study-badge"></div>
+                        </div>
+                        <div class="sk sk-study-summary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 id="claim" hidden></h1>
+
+            <h2 class="report-section-title" hidden>Overview</h2>
+
+            <div class="report-grid" hidden>
                 <section class="report-card">
                     <h3>Evidence Strength</h3>
                     <p id="strength"></p>
@@ -56,8 +113,8 @@
                 </section>
             </div>
 
-            <h2 class="report-section-title">Information On Individual Studies</h2>
-            <div id="breakdown"></div>
+            <h2 class="report-section-title" hidden>Information On Individual Studies</h2>
+            <div id="breakdown" hidden></div>
         </main>
 
         <script src="api_config.js"></script>
@@ -70,10 +127,27 @@
                 return cacheKey(CACHE_PREFIX, claimId);
             }
 
+            // Swap the skeleton screen for the real report once data
+            // arrives (from cache or the server).
+            function showReport() {
+                const skeleton = document.getElementById("report-skeleton");
+                if (skeleton) {
+                    skeleton.remove();
+                }
+                ["claim", "strength", "score", "population", "intervention", "studies"].forEach((id) => {
+                    document.getElementById(id).hidden = false;
+                });
+                document.querySelectorAll(".report-section-title").forEach((el) => {
+                    el.hidden = false;
+                });
+                document.getElementById("breakdown").hidden = false;
+            }
+
             // Fill every section of the report page. `fromCache` only
             // controls whether the data came from localStorage — users never
             // need to see that, so the score looks identical either way.
             function renderReport(report, fromCache) {
+                showReport();
                 const claimEl = document.getElementById("claim");
                 const populationEl = document.getElementById("population");
                 const interventionEl = document.getElementById("intervention");
@@ -202,7 +276,14 @@
                         return;
                     }
 
-                    report = JSON.parse(stored);
+                    try {
+                        report = JSON.parse(stored);
+                    } catch (err) {
+                        document.body.innerHTML =
+                            "<p>No report to show. " +
+                            "<a href=\"index.html\">Search for a claim</a>.</p>";
+                        return;
+                    }
                 }
 
                 renderReport(report, false);
