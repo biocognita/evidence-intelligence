@@ -346,9 +346,8 @@ body {
     background-color: #FBEAEA;
     color: var(--title-pink);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
     padding: 0.25rem 0.7rem;
     border-radius: 9999px;
     margin-bottom: 0.6rem;
@@ -556,10 +555,8 @@ body {
 
 .report-card h3 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: var(--ink-soft);
     margin: 0 0 0.7rem 0;
 }
