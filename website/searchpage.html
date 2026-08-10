@@ -9,39 +9,45 @@
 
     <body class="bodynorm">
         <nav class="navbar">
-            <div class="logo">
-                <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognitalogo" class="logopic"></a>
-                Evidence Intelligence Project
+            <div class="nav-inner">
+                <div class="logo">
+                    <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognita logo" class="logopic"></a>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="index.html#about">Methodology</a>
+                    <a href="index.html#about">Contact Us</a>
+                </div>
             </div>
         </nav>
 
-        <h1 class="searchtitle">Search claims</h1>
-
-        <div class="searcharea">
-            <div class="searchbar">
-                <div class="searchbar-row">
-                    <select id="search-column" class="searchcolumn">
-                        <option value="Claim">Claim</option>
-                        <option value="Intervention">Intervention</option>
-                        <option value="Outcome">Outcome</option>
-                        <option value="Population">Population</option>
-                    </select>
-                    <input
-                        id="claim-input"
-                        type="search"
-                        placeholder="Search a claim or keyword..."
-                        class="searchbarbar"
-                    >
-                    <button id="search-button" type="button">
-                        <img
-                            src="assets/images/searchicon.png"
-                            alt="searchbutton"
-                            class="searchbutton"
+        <main class="home-main">
+            <div class="home-inner">
+                <div class="searcharea">
+                    <div class="searchbar-row">
+                        <select id="search-column" class="searchcolumn">
+                            <option value="Claim">Claim</option>
+                            <option value="Intervention">Intervention</option>
+                            <option value="Outcome">Outcome</option>
+                            <option value="Population">Population</option>
+                        </select>
+                        <input
+                            id="claim-input"
+                            type="search"
+                            placeholder="Search here..."
+                            class="searchbarbar"
                         >
-                    </button>
+                        <button id="search-button" type="button">
+                            <img
+                                src="assets/images/searchicon.png"
+                                alt="searchbutton"
+                                class="searchbutton"
+                            >
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
 
         <p class="results-status" id="results-status">Searching…</p>
 

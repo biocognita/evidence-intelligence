@@ -1,3 +1,13 @@
+/* ============================================================
+   Evidence Intelligence — design system
+   Palette (from the reference design):
+     --header-pink  #F8B4B4   solid pastel header bar
+     --ink          #5C4D51   warm dark grey-brown text
+     --paper        #FFFEFB   main content background
+     --cream        #FCFCF0   About Us card background
+     --border       #E5E0D8   soft neutral border
+   ============================================================ */
+
 @font-face {
     font-family: 'ScopeOne-Regular';
     src: url('assets/fonts/ScopeOne-Regular.ttf') format('truetype');
@@ -5,106 +15,142 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'LexendExa';
-    src: url('assets/fonts/LexendExa-VariableFont_wght.ttf')format('truetype');
-}
-body{
-    margin:0px;
-    padding:0;
-    margin-inline: auto;
-    background-color: #FFF5F3; /* Warmer, cozier background tint */
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(216, 226, 220, 0.4) 0%, transparent 40%), /* Soft Green Cell Blob */
-        radial-gradient(circle at 90% 80%, rgba(255, 202, 212, 0.4) 0%, transparent 40%); /* Soft Pink Cell Blob */
-    background-attachment: fixed;
-    --pink: #FFCAD4;
-    --beige: #FFE5D9;
-    --marron: #9D8189;
-    --green: #D8E2DC;
-    --red:#F4ACB7;
+    src: url('assets/fonts/LexendExa-VariableFont_wght.ttf') format('truetype');
 }
 
-/*NavBar&Logo*/
-/* 1. The Navbar Track Layout */
-.navbar {
-    position: sticky;
-    top: 1.5rem;
-    width: 90%;
-    max-width: 75rem;
-    margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.75); /* Semi-transparent */
-    backdrop-filter: blur(12px); /* Creates the premium frosted glass texture */
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 9999px;
-    border-bottom:  5px solid#F4ACB7;
-    box-shadow: 0 8px 32px rgba(157, 129, 137, 0.06); /* Lighter, cloudier shadow */
+:root {
+    --header-pink: #F8B4B4;
+    --header-pink-dark: #E89C9C;
+    --ink: #5C4D51;
+    --ink-soft: #8A7D81;
+    --paper: #FFFEFB;
+    --cream: #FCFCF0;
+    --border: #E5E0D8;
+    --white: #FFFFFF;
+    --shadow-soft: 0 4px 14px rgba(92, 77, 81, 0.06);
+    --shadow-lift: 0 10px 28px rgba(92, 77, 81, 0.10);
 }
 
-/* 2. The Brand Container (Logo + Text Wrapper) */
-.logo {
-    display: flex; /* Converts the block into a flexible horizontal row */
-    align-items: center; /* PERFECTLY centers the square logo image and text vertically */
-    gap: 0.75rem; /* Creates a clean, scalable cushion between logo and text */
-    padding: 0.15rem 1.5rem; /* Breathing room inside the capsule */
-    
-    /* Cute Branding Typography Rules */
-    font-family: sans-serif;
-    color: #9D8189; /* Your structural Marron color hex */
-    font-weight: 700; /* Crisp bold look */
-    font-size: 1.1rem;
+* {
+    box-sizing: border-box;
 }
 
-/* 3. The Clickable Image Link Wrapper */
-.logo a {
-    display: flex; /* Ensures the anchor tag doesn't introduce text-alignment bugs */
-    align-items: center;
-}
-
-/* 4. The Square Logo Image Properties */
-.logopic {
-    max-height: 4rem; /* Limits size so it stays beautifully inside the nav pill */
-    width: auto; /* Maintains the square aspect ratio perfectly */
-    display: block; /* Erases old browser character baseline gaps */
-    
-    /* OPTIONAL: Nudge down further if the raw image file has uneven whitespace */
-    /* transform: translateY(2px); */
-}
-
-/*=========HomePage*=============/
-/*Search Bar*/
-/* 1. The Free-Floating Title (The Separator) */
-.searchtitle {
-    color: #5C4D51; /* Your structural Marron stands out beautifully alone */
-    font-size: 2.25rem;
-    font-family: LexendExa;
-    font-weight: 600;
-    text-align: center;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.8);
-    
-    /* The Magic Spacing: Pushes down away from the nav bar, and pushes the card away below it */
-    margin-top: 6rem;    /* Buffer from the navigation bar */
-    margin-bottom: 0.5rem; /* Buffer before the search card arrives */
-}
-
-/* 2. The Main Search Wrapper Area */
-.searcharea {
-    width: 100%;
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F2F0EE; /* light grey canvas behind everything */
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0 1.5rem; /* No top padding needed since the title handles the space! */
+    flex-direction: column;
 }
 
-/* 3. The White Search Card (Now clean and tightly focused) */
-.searchbar {
-    padding: 1.25rem 2rem; /* Shrunk vertical padding completely to remove the bulky box feel */
-    width: 90%;
-    max-width: 44rem;
+/* ============ Header (solid pink bar) ============ */
+
+.navbar {
+    background-color: var(--header-pink);
+    width: 100%;
+}
+
+.nav-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+}
+
+.logo a {
+    display: flex;
+    align-items: center;
+}
+
+.logopic {
+    max-height: 2.6rem;
+    width: auto;
+    display: block;
+    border-radius: 50%;
+    background-color: var(--white);
+}
+
+/* Header navigation links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.3rem 0.1rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--white);
+    border-bottom-color: var(--white);
+}
+
+/* ============ Home hero (white section) ============ */
+
+.home-main {
+    flex: 1;
+    background-color: var(--paper);
+    padding: 4.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.home-inner {
+    width: 100%;
+    max-width: 60rem;
     margin: 0 auto;
 }
-/* 4. The Internal Row Row Container */
+
+.home-title {
+    font-family: LexendExa, sans-serif;
+    font-weight: 700;
+    font-size: 2.75rem;
+    line-height: 1.15;
+    color: var(--header-pink-dark);
+    margin: 0;
+    max-width: 22ch;
+}
+
+.home-subtitle {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin: 0.9rem 0 0 0;
+}
+
+/* Search bar row */
+.searcharea {
+    margin-top: 2.75rem;
+    width: 100%;
+    max-width: 42rem;
+}
+
 .searchbar-row {
     display: flex;
     align-items: center;
@@ -112,99 +158,135 @@ body{
     width: 100%;
 }
 
-/* The column picker dropdown on the left of the search bar */
 .searchcolumn {
     flex-shrink: 0;
-    padding: 0.85rem 1rem;
-    border: 2px solid #FFE5D9;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--ink);
     border-radius: 9999px;
     font-size: 0.9rem;
-    color: #9D8189;
-    background-color: #FFFDFD;
+    color: var(--ink);
+    background-color: var(--white);
     outline: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchcolumn:focus {
-    border-color: #F4ACB7;
-    box-shadow: 0 0 10px rgba(244, 172, 183, 0.2);
+    box-shadow: 0 0 0 3px rgba(248, 180, 180, 0.35);
 }
 
-/* Small screens: stack the dropdown above the input instead of squeezing */
-@media (max-width: 560px) {
-    .searchbar-row {
-        flex-wrap: wrap;
-    }
-    .searchcolumn {
-        width: 100%;
-    }
-}
-
-/* 5. The Pill Input Field */
 .searchbarbar {
-    width: 100%;
-    padding: 0.85rem 1.5rem;
-    border: 2px solid #FFE5D9; /* Soft peach frame */
+    flex: 1;
+    min-width: 0;
+    padding: 0.8rem 1.4rem;
+    border: 1.5px solid var(--ink);
     border-radius: 9999px;
     font-size: 1rem;
-    color: #9D8189;
-    background-color: #FFFDFD;
+    color: var(--ink);
+    background-color: var(--white);
     outline: none;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchbarbar::placeholder {
+    color: #B9AEB1;
 }
 
 .searchbarbar:focus {
-    border-color: #F4ACB7;
-    box-shadow: 0 0 10px rgba(244, 172, 183, 0.2);
+    box-shadow: 0 0 0 3px rgba(248, 180, 180, 0.35);
 }
 
-/* 6. The Circle Pink Button */
-/* 4. Add a cozy bounce response to your Pink Button */
 #search-button {
-    background-color: #FFCAD4;
+    flex-shrink: 0;
+    background-color: var(--header-pink);
     border: none;
-    padding: 0.85rem; /* Made slightly larger to feel plush and round */
+    padding: 0.8rem;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 202, 212, 0.4); /* Pink glowing shadow under button */
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth cartoon-like bounce */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 #search-button:hover {
-    transform: scale(1.1) translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 202, 212, 0.6);
+    transform: translateY(-2px);
+    background-color: var(--header-pink-dark);
+    box-shadow: 0 6px 16px rgba(232, 156, 156, 0.45);
 }
 
 .searchbutton {
-    height: 1.25rem;
+    height: 1.15rem;
     width: auto;
+    filter: brightness(0.35); /* make the icon read as ink on pink */
 }
 
-/* Search hint line under the home page search bar */
 .search-hint {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #9D8189;
     margin: 0.9rem 0 0 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
 }
 
-/*=========Search Results Page=========*/
-/* Status line above the result cards */
+/* ============ About Us (cream card) ============ */
+
+.about-section {
+    background-color: var(--paper);
+    padding: 0 1.5rem 4.5rem;
+}
+
+.about-inner {
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
+}
+
+.about-card {
+    background-color: var(--cream);
+    border-radius: 1.25rem;
+    padding: 2.5rem 3rem;
+    border: 1px solid var(--border);
+}
+
+.about-card h2 {
+    font-family: LexendExa, sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--header-pink-dark);
+    margin: 0 0 1rem 0;
+}
+
+.about-card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* ============ Search results page ============ */
+
+.bodynorm {
+    min-height: 100vh;
+    background-color: #F2F0EE;
+}
+
+.bodynorm .home-main {
+    padding-top: 2.5rem;
+}
+
 .results-status {
-    text-align: center;
     font-size: 1.05rem;
     font-weight: 600;
-    color: #5C4D51;
-    margin: 2rem 0 1.25rem 0;
+    color: var(--ink);
+    margin: 2rem auto 1.25rem;
+    text-align: center;
+    max-width: 68rem;
 }
 
-/* The container for all result cards — responsive grid: 1 column on
-   phones, 2 columns on wider screens. */
 .results-area {
     width: 100%;
     max-width: 68rem;
     margin: 0 auto;
+    padding: 0 1.5rem;
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -222,65 +304,74 @@ body{
     }
 }
 
-/* Individual clickable result card */
 .result-card {
-    display: block;
-    background-color: #FFFFFF;
-    border-radius: 1.5rem;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.25rem;
-    border-left: 5px solid #F4ACB7;
-    box-shadow: 0 8px 30px rgba(157, 129, 137, 0.04);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--white);
+    border-radius: 1.1rem;
+    padding: 1.4rem 1.5rem;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--header-pink);
     text-decoration: none;
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .result-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 36px rgba(157, 129, 137, 0.12);
+    box-shadow: var(--shadow-lift);
 }
 
-/* Claim ID badge on the card */
 .result-id {
-    display: inline-block;
-    background-color: #FFE5D9;
-    color: #9D8189;
-    font-size: 0.75rem;
+    align-self: flex-start;
+    background-color: #FBEAEA;
+    color: var(--header-pink-dark);
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.5px;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.7rem;
     border-radius: 9999px;
     margin-bottom: 0.6rem;
 }
 
-/* Confidence score + strength line on the card */
 .result-score {
-    display: inline-block;
-    background-color: #D8E2DC;
-    color: #5C6B5E;
-    font-size: 0.75rem;
+    align-self: flex-start;
+    background-color: #EEF1EC;
+    color: #5F7260;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.7rem;
     border-radius: 9999px;
-    margin-left: 0.5rem;
+    margin-left: 0.4rem;
     margin-bottom: 0.6rem;
 }
 
-/* Per-study mini pills inside a result card */
+.result-claim {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+}
+
+.result-meta {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+}
+
+/* Per-study mini pills */
 .study-mini-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.9rem;
     padding-top: 0.9rem;
-    border-top: 1px dashed #FFE5D9;
+    border-top: 1px dashed var(--border);
 }
 
 .study-mini {
-    background-color: #FFF5F3;
-    border: 1px solid #FFCAD4;
-    color: #9D8189;
+    background-color: #F9F5F3;
+    border: 1px solid #F0D9D9;
+    color: var(--ink-soft);
     font-size: 0.72rem;
     font-weight: 600;
     padding: 0.25rem 0.6rem;
@@ -289,24 +380,25 @@ body{
 
 .study-mini-empty {
     font-size: 0.8rem;
-    color: #B9A6AC;
+    color: #B9AEB1;
 }
 
-/* Highlighted search match inside result cards */
+/* Highlighted search match */
 .match-highlight {
-    background-color: #FFCAD4;
-    color: #7A5A62;
+    background-color: #FDE1E1;
+    color: var(--header-pink-dark);
     border-radius: 4px;
     padding: 0 0.15rem;
     font-weight: 700;
 }
 
-/* Action buttons row (Refresh + Load more) under the results grid */
+/* Action buttons (Refresh + Load more) */
 .results-actions {
     display: flex;
     justify-content: center;
     gap: 1rem;
     margin: 2rem auto 0;
+    padding: 0 1.5rem;
     max-width: 68rem;
 }
 
@@ -314,45 +406,38 @@ body{
     margin: 0;
 }
 
-/* Load-more pagination button under the grid */
-.load-more {
+.load-more,
+.refresh-btn {
     display: inline-block;
-    padding: 0.85rem 2.5rem;
-    background-color: #FFCAD4;
-    color: #7A5A62;
-    font-size: 1rem;
-    font-weight: 700;
-    border: none;
+    padding: 0.8rem 2.2rem;
     border-radius: 9999px;
+    font-size: 0.95rem;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 202, 212, 0.4);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.load-more {
+    background-color: var(--header-pink);
+    color: var(--ink);
+    border: none;
 }
 
 .load-more:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 202, 212, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(248, 180, 180, 0.5);
 }
 
-/* Manual refresh button (bypasses the browser cache) */
 .refresh-btn {
-    display: inline-block;
-    padding: 0.85rem 1.8rem;
-    background-color: #FFFFFF;
-    color: #9D8189;
-    font-size: 1rem;
-    font-weight: 700;
-    border: 2px solid #FFE5D9;
-    border-radius: 9999px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(157, 129, 137, 0.1);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: var(--white);
+    color: var(--ink);
+    border: 1.5px solid var(--border);
 }
 
 .refresh-btn:hover {
-    transform: scale(1.05) translateY(-2px);
-    border-color: #F4ACB7;
-    box-shadow: 0 6px 20px rgba(244, 172, 183, 0.35);
+    transform: translateY(-2px);
+    border-color: var(--header-pink);
+    box-shadow: 0 6px 16px rgba(248, 180, 180, 0.3);
 }
 
 .load-more[hidden],
@@ -360,160 +445,136 @@ body{
     display: none;
 }
 
-/* The claim text itself */
-.result-claim {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #5C4D51;
-    margin-bottom: 0.35rem;
-}
-
-/* Intervention / Outcome / Population meta line */
-.result-meta {
-    font-size: 0.9rem;
-    color: #9D8189;
-}
-
-/* Keep the error/success message from the report page styling intact */
-.bodynorm > p, .results-area > p {
-    background-color: #FFFFFF;
+/* Error messages (server errors injected into the page body). The
+   search status line is also a direct <p> child of body, so exclude it
+   from this card treatment. */
+.bodynorm > p:not(.results-status) {
+    background-color: var(--white);
     padding: 2rem;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 30px rgba(157, 129, 137, 0.06);
-    border-left: 5px solid #F4ACB7;
-    font-size: 1.1rem;
+    border-radius: 1.1rem;
+    border: 1px solid var(--border);
+    font-size: 1.05rem;
     font-weight: 500;
     max-width: 35rem;
     text-align: center;
-    margin-top: 2rem;
-    margin-inline: auto;
+    margin: 2rem auto;
 }
 
-/*=========Report Page=========*/
-/* 1. Global Setup - Protects the layout even if JS deletes the container classes */
-.bodynorm, body {
-    background-color: #FFF5F3; /* Warm, cute background canvas */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #5C4D51; /* High-contrast dark plum-marron for perfect readability */
-    margin: 0;
-    padding: 2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* ============ Report page ============ */
 
-/* 2. Style ANY raw error messages generated by the server crash code */
-body > p {
-    background-color: #FFFFFF;
-    padding: 2rem;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 30px rgba(157, 129, 137, 0.06);
-    border-left: 5px solid #F4ACB7; /* Soft red/pink warning border line */
-    font-size: 1.1rem;
-    font-weight: 500;
-    max-width: 35rem;
-    text-align: center;
-    margin-top: 4rem;
-}
-
-
-
-/* 4. The Parameter Card Framework */
 .EvIntReport {
     width: 100%;
     max-width: 44rem;
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
 }
 
-/* The Giant Claim Title: Floating completely naked with NO boxes */
 #claim {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #5C4D51;
+    color: var(--ink);
     margin: 2rem 0;
-    padding: 0;
-    background: none !important;
-    box-shadow: none !important;
 }
 
-/* 5. Parameter Box - Upper Half (The Title Labels) */
 .EvIntReport h3 {
-    background-color: #FFFFFF; /* White card box starts here */
-    padding: 1.5rem 1.5rem 0.25rem 1.5rem;
+    background-color: var(--white);
+    padding: 1.4rem 1.5rem 0.25rem 1.5rem;
     margin: 0;
-    border-radius: 1.5rem 1.5rem 0 0; /* Rounds only the top corners */
-    
-    font-size: 0.85rem;
+    border-radius: 1.1rem 1.1rem 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #9D8189; /* Light brand marron subtitle */
+    color: var(--ink-soft);
 }
 
-/* 6. Parameter Box - Lower Half (The Dynamic Data Strings) */
 .EvIntReport p {
-    background-color: #FFFFFF; /* Completes the white box layer */
-    padding: 0 1.5rem 1.5rem 1.5rem;
-    
-    /* THE CRITICAL SPACER: Creates the box gap spacing BEFORE the next card starts */
-    margin: 0 0 1.5rem 0; 
-    
-    border-radius: 0 0 1.5rem 1.5rem; /* Rounds the bottom corners to complete the card */
-    box-shadow: 0 8px 30px rgba(157, 129, 137, 0.04); /* Cloud shadow */
-    
-    font-size: 1.25rem;
+    background-color: var(--white);
+    padding: 0 1.5rem 1.4rem 1.5rem;
+    margin: 0 0 1.4rem 0;
+    border-radius: 0 0 1.1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-top: none;
+    box-shadow: var(--shadow-soft);
+    font-size: 1.2rem;
     font-weight: 600;
-    color: #5C4D51;
+    color: var(--ink);
 }
 
-/* 7. Clear Space Framework for the Study Breakdown Section at the bottom */
 .EvIntReport + div {
     width: 100%;
     max-width: 44rem;
-    margin-top: 2rem;
+    margin: 0 auto 2rem;
 }
 
 .EvIntReport + div h2 {
-    font-size: 1.5rem;
-    color: #5C4D51;
-    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-bottom: 1.4rem;
 }
 
-/* Container for all study blocks */
 #breakdown {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;          /* Spaces the blocks apart nicely */
-    margin-top: 1rem;
-    max-width: 800px;     /* Keeps blocks readable and centered if needed */
+    gap: 1.2rem;
 }
 
-/* Individual study block formatting */
 .study-card {
-    background-color: #ffffff;
-    border-radius: 12px;  /* Smooth, clean corners */
-    padding: 1.5rem;      /* Spacing inside the white block */
-    box-shadow: 0 4px 12px rgba(157, 128, 117, 0.1); /* Soft peachy/neutral shadow */
-    border-left: 5px solid #F4ACB7; /* Peachy accent line on the left edge */
+    background-color: var(--white);
+    border-radius: 1.1rem;
+    padding: 1.3rem 1.5rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--header-pink);
     transition: transform 0.2s ease;
 }
 
-/* Optional hover effect for the blocks */
 .study-card:hover {
     transform: translateY(-2px);
 }
 
-/* Heading for the Study ID inside the block */
 .studyID {
-    margin-top: 0;        /* Flushes the heading to the top of the block */
-    margin-bottom: 0.5rem;
-    color: #4A3E3D;       /* Deep neutral warm tone for contrast */
-    font-size: 1.25rem;
+    margin: 0 0 0.4rem 0;
+    color: var(--ink);
+    font-size: 1.2rem;
 }
 
-/* Score text inside the block */
 .study-score {
     margin: 0;
-    color: #7A6B68;       /* Slightly lighter text for the secondary info */
-    font-size: 1rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+}
+
+/* ============ Mobile ============ */
+
+@media (max-width: 640px) {
+    .home-title {
+        font-size: 2rem;
+    }
+
+    .home-main {
+        padding: 3rem 1.25rem 3.5rem;
+    }
+
+    .about-card {
+        padding: 1.8rem 1.5rem;
+    }
+
+    .searchbar-row {
+        flex-wrap: wrap;
+    }
+
+    .searchcolumn {
+        width: 100%;
+    }
+
+    .nav-links {
+        gap: 1rem;
+    }
+
+    .nav-links a {
+        font-size: 0.85rem;
+    }
 }

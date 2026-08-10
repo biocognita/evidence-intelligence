@@ -4,48 +4,67 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Evidence Intelligence Project</title>
-        <link href="style.css?v=1" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=7" rel="stylesheet" type="text/css"/>
     </head>
     <body>
         <nav class="navbar">
-            <div class="logo">
-                <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognitalogo" class="logopic"></a>
-                Evidence Intelligence Project
+            <div class="nav-inner">
+                <div class="logo">
+                    <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognita logo" class="logopic"></a>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="#about">Methodology</a>
+                    <a href="#about">Contact Us</a>
+                </div>
             </div>
         </nav>
 
-        <!-- The Free-Floating Separator Title -->
+        <main class="home-main">
+            <div class="home-inner">
+                <h1 class="home-title">Evidence Intelligence Project</h1>
+                <p class="home-subtitle">Research simplified</p>
 
-        <h1 class="searchtitle">Start here...</h1>
+                <div class="searcharea">
+                    <div class="searchbar-row">
+                        <select id="search-column" class="searchcolumn">
+                            <option value="Claim">Claim</option>
+                            <option value="Intervention">Intervention</option>
+                            <option value="Outcome">Outcome</option>
+                            <option value="Population">Population</option>
+                        </select>
+                        <input
+                            id="claim-input"
+                            type="search"
+                            placeholder="Search here..."
+                            class="searchbarbar"
+                        >
+                        <button id="search-button" type="button">
+                            <img
+                                src="assets/images/searchicon.png"
+                                alt="searchbutton"
+                                class="searchbutton"
+                            >
+                        </button>
+                    </div>
+                    <p class="search-hint">Try a claim ID like C0001, or search by keyword — pick the field to search on the left</p>
+                </div>
+            </div>
+        </main>
 
-<!-- The Clean Search Card Block below it -->
-<div class="searcharea">
-    <div class="searchbar">
-        <div class="searchbar-row">
-            <select id="search-column" class="searchcolumn">
-                <option value="Claim">Claim</option>
-                <option value="Intervention">Intervention</option>
-                <option value="Outcome">Outcome</option>
-                <option value="Population">Population</option>
-            </select>
-            <input
-                id="claim-input"
-                type="search"
-                placeholder="Search a claim or keyword..."
-                class="searchbarbar"
-            >
-            <button id="search-button" type="button">
-                <img
-                    src="assets/images/searchicon.png"
-                    alt="searchbutton"
-                    class="searchbutton"
-                >
-            </button>
-        </div>
-        <p class="search-hint">Try a claim ID like C0001, or search by keyword — pick the field to search on the left</p>
-    </div>
-</div>
-
+        <section class="about-section" id="about">
+            <div class="about-inner">
+                <div class="about-card">
+                    <h2>About Us</h2>
+                    <p>
+                        The Evidence Intelligence Project organizes biomedical research,
+                        evaluates study quality, and estimates how confident we can be in
+                        health claims. Every score is transparent — you can see which
+                        studies back a claim and how strong each piece of evidence is.
+                    </p>
+                </div>
+            </div>
+        </section>
 
         <script src="scripts.js"></script>
     </body>
