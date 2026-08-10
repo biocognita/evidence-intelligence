@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=17" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=19" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -45,7 +45,18 @@
             </div>
         </main>
 
-        <p class="results-status" id="results-status">Searching…</p>
+        <div class="results-header" id="results-header" hidden>
+            <div class="results-header-inner">
+                <div class="results-title-row">
+                    <h2 class="results-title">Search Results</h2>
+                    <span class="result-chip chip-query" id="chip-query"></span>
+                </div>
+                <div class="results-status-row">
+                    <span class="result-chip chip-count" id="chip-count"></span>
+                    <p class="results-status" id="results-status">Searching…</p>
+                </div>
+            </div>
+        </div>
 
         <div id="results" class="results-area"></div>
 
@@ -88,16 +99,27 @@
                     el.classList.toggle("is-bar", bar);
                 }
 
+                // Fill the cute results header: query + count chips, and a
+                // short status line (the chips already carry the detail).
+                function showResultsHeader(count, total) {
+                    const header = document.getElementById("results-header");
+                    header.hidden = false;
+                    document.getElementById("chip-query").textContent =
+                        `“${currentQuery}”`;
+                    document.getElementById("chip-count").textContent =
+                        total === 0
+                            ? "No claims"
+                            : `${count} of ${total} claim${total === 1 ? "" : "s"}`;
+                }
+
                 function renderResults(results, total) {
                 const container = document.getElementById("results");
                 const loadMoreBtn = document.getElementById("load-more");
                 const refreshBtn = document.getElementById("refresh");
 
                 const shown = currentOffset + results.length;
-                setStatus(
-                    `Showing ${shown} of ${total} claim${total === 1 ? "" : "s"} ` +
-                    `matching “${currentQuery}” in ${currentColumn}.`
-                );
+                showResultsHeader(shown, total);
+                setStatus(`in ${currentColumn}`);
 
                 results.forEach((claim) => {
                     container.appendChild(renderResultCard(claim));
@@ -208,6 +230,7 @@
                     document.getElementById("claim-input").value = currentQuery;
 
                     if (!currentQuery) {
+                        document.getElementById("results-header").hidden = true;
                         setStatus(
                             "Type a keyword above to search the claim database.",
                             true
@@ -220,6 +243,7 @@
 
                     container.innerHTML = "";
                     setStatus("Searching…");
+                    document.getElementById("results-header").hidden = true;
 
                     // Cache hit: render instantly, skip the network round-trip
                     const cached = readCache(searchCacheKey());
@@ -250,6 +274,7 @@
                     }
                     payload = await response.json();
                 } catch (err) {
+                    document.getElementById("results-header").hidden = true;
                     setStatus(
                         "Couldn't reach the Evidence Intelligence server. " +
                         "Make sure the server is running.",
@@ -262,10 +287,10 @@
                 }
 
                 if (payload.total === 0) {
-                    setStatus(
-                        `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`,
-                        true
-                    );
+                    // The header box is the container here, so the message
+                    // is plain text inside it (no extra bar).
+                    showResultsHeader(0, 0);
+                    setStatus("No claims found. Try another keyword.");
                     loadMoreBtn.hidden = true;
                     isLoading = false;
                     loadMoreBtn.textContent = "Load more results";

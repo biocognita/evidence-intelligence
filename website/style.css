@@ -332,15 +332,76 @@ body {
     padding-bottom: 2rem;
 }
 
+/* Cute results header — same white card + pink top accent as the
+   result cards, with pill chips for the query and the count. */
+.results-header {
+    width: 100%;
+    max-width: 68rem;
+    margin: 2rem auto 1.25rem;
+    padding: 0 1.5rem;
+}
+
+.results-header-inner {
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--header-pink);
+    border-radius: 1.1rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.results-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.results-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem; /* lead */
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* Pill chips: pink query chip + beige count chip (like the badges
+   on the result cards) */
+.result-chip {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem; /* small */
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.chip-query {
+    background-color: #FBEAEA;
+    color: var(--title-pink);
+}
+
+.chip-count {
+    background-color: #F6F0E2;
+    color: #7A6B50;
+}
+
+.results-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .results-status {
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem; /* body */
-    font-weight: 600;
-    color: var(--ink);
-    margin: 2rem auto 1.25rem;
-    text-align: center;
-    max-width: 68rem;
-    padding: 0 1.5rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin: 0;
 }
 
 .results-area {
