@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
+import gc
 import os
 import time
 
@@ -93,6 +94,12 @@ def get_claim_report(claim_id):
         confidence,
         study_scores
     )
+
+    # Aggressive memory reclaim on the 512 MB Render free tier: drop the
+    # per-request temporaries now that the JSON payload is built, and ask
+    # the garbage collector to release any cyclic garbage immediately.
+    del studies, study_scores, claim
+    gc.collect()
 
     return jsonify(report)
 
