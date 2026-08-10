@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=11" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=12" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -71,8 +71,9 @@
                 return cacheKey(CACHE_PREFIX, claimId);
             }
 
-            // Fill every section of the report page. When `fromCache` is
-            // true the "(cached)" suffix is appended to the score.
+            // Fill every section of the report page. `fromCache` only
+            // controls whether the data came from localStorage — users never
+            // need to see that, so the score looks identical either way.
             function renderReport(report, fromCache) {
                 const claimEl = document.getElementById("claim");
                 const populationEl = document.getElementById("population");
@@ -87,9 +88,8 @@
                 interventionEl.textContent = "";
                 interventionEl.appendChild(highlightText(report.intervention || "", query));
 
-                const scoreSuffix = fromCache ? " (cached)" : "";
                 document.getElementById("score").textContent =
-                    report.confidence_score + "/100" + scoreSuffix;
+                    report.confidence_score + "/100";
 
                 document.getElementById("strength").textContent =
                     report.evidence_strength;

@@ -87,16 +87,15 @@
                     el.classList.toggle("is-bar", bar);
                 }
 
-                function renderResults(results, total, fromCache) {
+                function renderResults(results, total) {
                 const container = document.getElementById("results");
                 const loadMoreBtn = document.getElementById("load-more");
                 const refreshBtn = document.getElementById("refresh");
 
                 const shown = currentOffset + results.length;
-                const suffix = fromCache ? " (cached)" : "";
                 setStatus(
                     `Showing ${shown} of ${total} claim${total === 1 ? "" : "s"} ` +
-                    `matching “${currentQuery}” in ${currentColumn}:${suffix}`
+                    `matching “${currentQuery}” in ${currentColumn}.`
                 );
 
                 results.forEach((claim) => {
@@ -225,7 +224,7 @@
                     if (cached && !params.get("fresh")) {
                         // Guard against corrupt storage: only accept arrays
                         cachedResults = Array.isArray(cached.results) ? cached.results : [];
-                        renderResults(cachedResults, cached.total, true);
+                        renderResults(cachedResults, cached.total);
                         isLoading = false;
                         return;
                     }
@@ -273,7 +272,7 @@
                     total: payload.total,
                     results: cachedResults
                 });
-                renderResults(payload.results, payload.total, false);
+                renderResults(payload.results, payload.total);
                 isLoading = false;
             }
 
