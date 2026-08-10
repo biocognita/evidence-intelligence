@@ -67,19 +67,34 @@ SEARCH_COLUMN = "Claim"
 # dropdown always matches what the backend will accept.
 SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"]
 
+# Pagination defaults for /search so huge result sets are never all
+# serialized in one response.
+SEARCH_DEFAULT_LIMIT = 20
+SEARCH_MAX_LIMIT = 100
+
+
+def _clamp_int(value, default, minimum, maximum):
+    """Parse an int query param safely; return `default` on garbage."""
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(minimum, min(parsed, maximum))
+
 
 @app.route("/search")
 def search_claims():
     """Case-insensitive substring search over a claim text column.
 
     Examples:
-      /search?q=melatonin                     -> search the Claim text
-      /search?q=melatonin&col=Intervention    -> search the Intervention column
+      /search?q=melatonin                       -> search the Claim text
+      /search?q=melatonin&col=Intervention      -> search the Intervention column
+      /search?q=melatonin&limit=10&offset=20    -> paginate the results
 
-    Only the matched subset is serialized to JSON. Each result is enriched
-    with its confidence score + evidence strength (computed from the cached
-    study data), and per-request temporaries are released before the
-    response goes out.
+    Only the matched page is serialized to JSON. Each result is enriched
+    with its confidence score, evidence strength and per-study breakdown
+    (computed from the cached study data), and per-request temporaries are
+    released before the response goes out.
     """
 
     query = (request.args.get("q") or "").strip()
@@ -91,6 +106,10 @@ def search_claims():
     # not in the whitelist (never trust client input blindly).
     requested_col = (request.args.get("col") or "").strip()
     search_column = requested_col if requested_col in SEARCHABLE_COLUMNS else SEARCH_COLUMN
+
+    # Pagination: clamp so a huge or negative limit can't blow up memory.
+    limit = _clamp_int(request.args.get("limit"), SEARCH_DEFAULT_LIMIT, 1, SEARCH_MAX_LIMIT)
+    offset = _clamp_int(request.args.get("offset"), 0, 0, 10_000)
 
     try:
         data = get_data()
@@ -104,23 +123,29 @@ def search_claims():
     claims = data["claim_data"]
 
     # Lazy filtering: only rows containing the query (case-insensitive) are
-    # materialized, then converted to records for the front end.
-    # astype("string") keeps this working even if the searched column is a
-    # low-cardinality column (compressed to category dtype), and
-    # regex=False treats the query as literal text (a query like "C+"
-    # must not be interpreted as a regular expression).
+    # materialized. astype("string") keeps this working even if the
+    # searched column is a low-cardinality column (compressed to category
+    # dtype), and regex=False treats the query as literal text (a query
+    # like "C+" must not be interpreted as a regular expression).
     matched = claims[
         claims[search_column]
         .astype("string")
         .str.contains(query, case=False, na=False, regex=False)
     ]
+
+    total = len(matched)
+
+    # Slice BEFORE serializing so only the requested page is ever
+    # materialized as JSON (the memory win from pagination).
+    page = matched.iloc[offset:offset + limit]
+
     # to_json() emits `null` for NaN/empty cells (browsers reject the raw
     # `NaN` literal that to_dict() would leave in the payload).
-    results = json.loads(matched.to_json(orient="records"))
+    results = json.loads(page.to_json(orient="records"))
 
-    # Enrich each result with its confidence score + strength using the
-    # cached study index (no extra Google Sheets calls). Skip claims with
-    # no studies rather than failing the whole search.
+    # Enrich each result with its confidence score + strength + per-study
+    # breakdown using the cached study index (no extra Google Sheets
+    # calls). Skip claims with no studies rather than failing the search.
     for record in results:
         claim_id = record.get("Claim ID")
         try:
@@ -131,21 +156,29 @@ def search_claims():
         except KeyError:
             continue
         try:
-            score, strength, _ = evaluate_claim(record, studies)
+            score, strength, study_scores = evaluate_claim(record, studies)
         except Exception:
             continue
         record["confidence_score"] = round(score, 2)
         record["evidence_strength"] = strength
-        del studies
+        record["study_breakdown"] = [
+            {"study_id": study_id, "quality_score": round(qs, 2)}
+            for study_id, qs in zip(studies["Study ID"].tolist(), study_scores)
+        ]
+        del studies, study_scores
 
     # Aggressive memory reclaim on the 512 MB Render free tier.
-    del matched, claims, data
+    del matched, page, claims, data
     gc.collect()
 
     return jsonify({
         "query": query,
         "column": search_column,
         "count": len(results),
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "has_more": (offset + len(results)) < total,
         "results": results
     })
 

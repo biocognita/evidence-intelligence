@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Search Results - Evidence Intelligence</title>
-        <link href="style.css?v=3" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=4" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -47,35 +47,119 @@
 
         <div id="results" class="results-area"></div>
 
+        <button id="load-more" class="load-more" type="button" hidden>Load more results</button>
+
         <script src="api_config.js"></script>
         <script src="scripts.js"></script>
         <script>
             const SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"];
+            const PAGE_SIZE = 20;
 
-            async function loadSearchResults() {
+            let currentQuery = "";
+            let currentColumn = "Claim";
+            let currentOffset = 0;
+            let hasMore = false;
+
+            function renderStudyBreakdown(breakdown) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "study-mini-grid";
+
+                (breakdown || []).forEach((study) => {
+                    const pill = document.createElement("span");
+                    pill.className = "study-mini";
+                    pill.textContent = `${study.study_id} · ${study.quality_score}/100`;
+                    wrapper.appendChild(pill);
+                });
+
+                if ((breakdown || []).length === 0) {
+                    const none = document.createElement("span");
+                    none.className = "study-mini-empty";
+                    none.textContent = "No study breakdown available";
+                    wrapper.appendChild(none);
+                }
+
+                return wrapper;
+            }
+
+            function renderResultCard(claim) {
+                const card = document.createElement("a");
+                card.className = "result-card";
+                card.href = `reportpage.html?claim=${encodeURIComponent(claim["Claim ID"])}`;
+
+                const idLine = document.createElement("div");
+                idLine.className = "result-id";
+                idLine.textContent = claim["Claim ID"];
+
+                const scoreLine = document.createElement("div");
+                scoreLine.className = "result-score";
+                if (typeof claim.confidence_score === "number") {
+                    scoreLine.textContent =
+                        `Confidence ${claim.confidence_score}/100 · ${claim.evidence_strength || "n/a"}`;
+                } else {
+                    scoreLine.textContent = "No score available";
+                }
+
+                const claimLine = document.createElement("div");
+                claimLine.className = "result-claim";
+                claimLine.textContent = claim["Claim"] || "";
+
+                const metaLine = document.createElement("div");
+                metaLine.className = "result-meta";
+                const meta = [
+                    claim["Intervention"],
+                    claim["Outcome"],
+                    claim["Population"]
+                ].filter(Boolean);
+                metaLine.textContent = meta.join(" · ") || "No details available";
+
+                card.appendChild(idLine);
+                card.appendChild(scoreLine);
+                card.appendChild(claimLine);
+                card.appendChild(metaLine);
+                card.appendChild(renderStudyBreakdown(claim.study_breakdown));
+
+                return card;
+            }
+
+            async function loadSearchResults(reset = true) {
 
                 const params = new URLSearchParams(window.location.search);
-                const query = (params.get("q") || "").trim();
-                const column = SEARCHABLE_COLUMNS.includes(params.get("col"))
-                    ? params.get("col")
-                    : "Claim";
 
-                // Prefill the search box + column picker so users can refine
-                document.getElementById("claim-input").value = query;
-                document.getElementById("search-column").value = column;
+                if (reset) {
+                    currentQuery = (params.get("q") || "").trim();
+                    currentColumn = SEARCHABLE_COLUMNS.includes(params.get("col"))
+                        ? params.get("col")
+                        : "Claim";
+                    currentOffset = 0;
 
-                if (!query) {
-                    document.getElementById("results-status").textContent =
-                        "Type a keyword above to search the claim database.";
-                    return;
+                    // Prefill the search box + column picker so users can refine
+                    document.getElementById("claim-input").value = currentQuery;
+                    document.getElementById("search-column").value = currentColumn;
                 }
 
                 const status = document.getElementById("results-status");
                 const container = document.getElementById("results");
+                const loadMoreBtn = document.getElementById("load-more");
+
+                if (!currentQuery) {
+                    status.textContent =
+                        "Type a keyword above to search the claim database.";
+                    loadMoreBtn.hidden = true;
+                    return;
+                }
+
+                if (reset) {
+                    status.textContent = "Searching…";
+                }
 
                 let payload;
                 try {
-                    const searchParams = new URLSearchParams({ q: query, col: column });
+                    const searchParams = new URLSearchParams({
+                        q: currentQuery,
+                        col: currentColumn,
+                        limit: String(PAGE_SIZE),
+                        offset: String(currentOffset)
+                    });
                     const response = await fetch(`${API_BASE}/search?${searchParams.toString()}`);
                     if (!response.ok) {
                         throw new Error(`Search failed (HTTP ${response.status})`);
@@ -85,59 +169,40 @@
                     status.textContent =
                         "Couldn't reach the Evidence Intelligence server. " +
                         "Make sure the server is running.";
+                    loadMoreBtn.hidden = true;
                     return;
                 }
 
-                container.innerHTML = "";
+                if (reset) {
+                    container.innerHTML = "";
+                }
 
-                if (payload.count === 0) {
-                    status.textContent = `No claims match “${query}” in ${column}. Try another keyword.`;
+                if (payload.total === 0) {
+                    status.textContent =
+                        `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`;
+                    loadMoreBtn.hidden = true;
                     return;
                 }
 
+                const shown = currentOffset + payload.results.length;
                 status.textContent =
-                    `${payload.count} claim${payload.count === 1 ? "" : "s"} match “${query}” in ${column}:`;
+                    `Showing ${shown} of ${payload.total} claim${payload.total === 1 ? "" : "s"} ` +
+                    `matching “${currentQuery}” in ${currentColumn}:`;
 
                 payload.results.forEach((claim) => {
-                    const card = document.createElement("a");
-                    card.className = "result-card";
-                    card.href = `reportpage.html?claim=${encodeURIComponent(claim["Claim ID"])}`;
-
-                    const idLine = document.createElement("div");
-                    idLine.className = "result-id";
-                    idLine.textContent = claim["Claim ID"];
-
-                    const scoreLine = document.createElement("div");
-                    scoreLine.className = "result-score";
-                    if (typeof claim.confidence_score === "number") {
-                        scoreLine.textContent =
-                            `Confidence ${claim.confidence_score}/100 · ${claim.evidence_strength || "n/a"}`;
-                    } else {
-                        scoreLine.textContent = "No score available";
-                    }
-
-                    const claimLine = document.createElement("div");
-                    claimLine.className = "result-claim";
-                    claimLine.textContent = claim["Claim"] || "";
-
-                    const metaLine = document.createElement("div");
-                    metaLine.className = "result-meta";
-                    const meta = [
-                        claim["Intervention"],
-                        claim["Outcome"],
-                        claim["Population"]
-                    ].filter(Boolean);
-                    metaLine.textContent = meta.join(" · ") || "No details available";
-
-                    card.appendChild(idLine);
-                    card.appendChild(scoreLine);
-                    card.appendChild(claimLine);
-                    card.appendChild(metaLine);
-                    container.appendChild(card);
+                    container.appendChild(renderResultCard(claim));
                 });
+
+                hasMore = payload.has_more;
+                currentOffset = shown;
+                loadMoreBtn.hidden = !hasMore;
             }
 
-            loadSearchResults();
+            document.getElementById("load-more").addEventListener("click", () => {
+                loadSearchResults(false);
+            });
+
+            loadSearchResults(true);
         </script>
     </body>
 </html>

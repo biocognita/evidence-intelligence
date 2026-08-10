@@ -199,11 +199,27 @@ body{
     margin: 2rem 0 1.25rem 0;
 }
 
-/* The container for all result cards */
+/* The container for all result cards — responsive grid: 1 column on
+   phones, 2 columns on wider screens. */
 .results-area {
     width: 100%;
-    max-width: 44rem;
+    max-width: 68rem;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+@media (min-width: 720px) {
+    .results-area {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1100px) {
+    .results-area {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Individual clickable result card */
@@ -249,6 +265,56 @@ body{
     border-radius: 9999px;
     margin-left: 0.5rem;
     margin-bottom: 0.6rem;
+}
+
+/* Per-study mini pills inside a result card */
+.study-mini-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px dashed #FFE5D9;
+}
+
+.study-mini {
+    background-color: #FFF5F3;
+    border: 1px solid #FFCAD4;
+    color: #9D8189;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.study-mini-empty {
+    font-size: 0.8rem;
+    color: #B9A6AC;
+}
+
+/* Load-more pagination button under the grid */
+.load-more {
+    display: block;
+    margin: 2rem auto;
+    padding: 0.85rem 2.5rem;
+    background-color: #FFCAD4;
+    color: #7A5A62;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 202, 212, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.load-more:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 202, 212, 0.6);
+}
+
+.load-more[hidden] {
+    display: none;
 }
 
 /* The claim text itself */
