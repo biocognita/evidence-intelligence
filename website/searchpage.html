@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Search Results - Evidence Intelligence</title>
+        <link href="style.css?v=2" rel="stylesheet" type="text/css"/>
+    </head>
+
+    <body class="bodynorm">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html"><img src="assets/images/biocognitalogo.png" alt="biocognitalogo" class="logopic"></a>
+                Evidence Intelligence Project
+            </div>
+        </nav>
+
+        <h1 class="searchtitle">Search claims</h1>
+
+        <div class="searcharea">
+            <div class="searchbar">
+                <div class="searchbar-row">
+                    <input
+                        id="claim-input"
+                        type="search"
+                        placeholder="Search a claim or keyword..."
+                        class="searchbarbar"
+                    >
+                    <button id="search-button" type="button">
+                        <img
+                            src="assets/images/searchicon.png"
+                            alt="searchbutton"
+                            class="searchbutton"
+                        >
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="results-area">
+            <p class="results-status" id="results-status">Searching…</p>
+        </div>
+
+        <script src="api_config.js"></script>
+        <script src="scripts.js"></script>
+        <script>
+            async function loadSearchResults() {
+
+                const params = new URLSearchParams(window.location.search);
+                const query = (params.get("q") || "").trim();
+
+                if (!query) {
+                    document.getElementById("results-status").textContent =
+                        "Type a keyword above to search the claim database.";
+                    return;
+                }
+
+                // Prefill the search box so users can refine their query
+                document.getElementById("claim-input").value = query;
+
+                const status = document.getElementById("results-status");
+                const container = document.getElementById("results");
+
+                let payload;
+                try {
+                    const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        throw new Error(`Search failed (HTTP ${response.status})`);
+                    }
+                    payload = await response.json();
+                } catch (err) {
+                    status.textContent =
+                        "Couldn't reach the Evidence Intelligence server. " +
+                        "Make sure the server is running.";
+                    return;
+                }
+
+                container.innerHTML = "";
+
+                if (payload.count === 0) {
+                    status.textContent = `No claims match “${query}”. Try another keyword.`;
+                    return;
+                }
+
+                status.textContent =
+                    `${payload.count} claim${payload.count === 1 ? "" : "s"} match “${query}”:`;
+
+                payload.results.forEach((claim) => {
+                    const card = document.createElement("a");
+                    card.className = "result-card";
+                    card.href = `reportpage.html?claim=${encodeURIComponent(claim["Claim ID"])}`;
+
+                    const idLine = document.createElement("div");
+                    idLine.className = "result-id";
+                    idLine.textContent = claim["Claim ID"];
+
+                    const claimLine = document.createElement("div");
+                    claimLine.className = "result-claim";
+                    claimLine.textContent = claim["Claim"] || "";
+
+                    const metaLine = document.createElement("div");
+                    metaLine.className = "result-meta";
+                    const meta = [
+                        claim["Intervention"],
+                        claim["Outcome"],
+                        claim["Population"]
+                    ].filter(Boolean);
+                    metaLine.textContent = meta.join(" · ") || "No details available";
+
+                    card.appendChild(idLine);
+                    card.appendChild(claimLine);
+                    card.appendChild(metaLine);
+                    container.appendChild(card);
+                });
+            }
+
+            loadSearchResults();
+        </script>
+    </body>
+</html>

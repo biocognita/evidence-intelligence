@@ -152,6 +152,91 @@ body{
     width: auto;
 }
 
+/* Search hint line under the home page search bar */
+.search-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9D8189;
+    margin: 0.9rem 0 0 0;
+}
+
+/*=========Search Results Page=========*/
+/* Status line above the result cards */
+.results-status {
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #5C4D51;
+    margin: 2rem 0 1.25rem 0;
+}
+
+/* The container for all result cards */
+.results-area {
+    width: 100%;
+    max-width: 44rem;
+    margin: 0 auto;
+}
+
+/* Individual clickable result card */
+.result-card {
+    display: block;
+    background-color: #FFFFFF;
+    border-radius: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    border-left: 5px solid #F4ACB7;
+    box-shadow: 0 8px 30px rgba(157, 129, 137, 0.04);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(157, 129, 137, 0.12);
+}
+
+/* Claim ID badge on the card */
+.result-id {
+    display: inline-block;
+    background-color: #FFE5D9;
+    color: #9D8189;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    margin-bottom: 0.6rem;
+}
+
+/* The claim text itself */
+.result-claim {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #5C4D51;
+    margin-bottom: 0.35rem;
+}
+
+/* Intervention / Outcome / Population meta line */
+.result-meta {
+    font-size: 0.9rem;
+    color: #9D8189;
+}
+
+/* Keep the error/success message from the report page styling intact */
+.bodynorm > p, .results-area > p {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(157, 129, 137, 0.06);
+    border-left: 5px solid #F4ACB7;
+    font-size: 1.1rem;
+    font-weight: 500;
+    max-width: 35rem;
+    text-align: center;
+    margin-top: 2rem;
+    margin-inline: auto;
+}
+
 /*=========Report Page=========*/
 /* 1. Global Setup - Protects the layout even if JS deletes the container classes */
 .bodynorm, body {
