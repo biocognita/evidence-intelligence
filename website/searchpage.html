@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>Search Results - Evidence Intelligence</title>
-        <link href="style.css?v=2" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=3" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -20,6 +20,12 @@
         <div class="searcharea">
             <div class="searchbar">
                 <div class="searchbar-row">
+                    <select id="search-column" class="searchcolumn">
+                        <option value="Claim">Claim</option>
+                        <option value="Intervention">Intervention</option>
+                        <option value="Outcome">Outcome</option>
+                        <option value="Population">Population</option>
+                    </select>
                     <input
                         id="claim-input"
                         type="search"
@@ -44,10 +50,19 @@
         <script src="api_config.js"></script>
         <script src="scripts.js"></script>
         <script>
+            const SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"];
+
             async function loadSearchResults() {
 
                 const params = new URLSearchParams(window.location.search);
                 const query = (params.get("q") || "").trim();
+                const column = SEARCHABLE_COLUMNS.includes(params.get("col"))
+                    ? params.get("col")
+                    : "Claim";
+
+                // Prefill the search box + column picker so users can refine
+                document.getElementById("claim-input").value = query;
+                document.getElementById("search-column").value = column;
 
                 if (!query) {
                     document.getElementById("results-status").textContent =
@@ -55,15 +70,13 @@
                     return;
                 }
 
-                // Prefill the search box so users can refine their query
-                document.getElementById("claim-input").value = query;
-
                 const status = document.getElementById("results-status");
                 const container = document.getElementById("results");
 
                 let payload;
                 try {
-                    const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+                    const searchParams = new URLSearchParams({ q: query, col: column });
+                    const response = await fetch(`${API_BASE}/search?${searchParams.toString()}`);
                     if (!response.ok) {
                         throw new Error(`Search failed (HTTP ${response.status})`);
                     }
@@ -78,12 +91,12 @@
                 container.innerHTML = "";
 
                 if (payload.count === 0) {
-                    status.textContent = `No claims match “${query}”. Try another keyword.`;
+                    status.textContent = `No claims match “${query}” in ${column}. Try another keyword.`;
                     return;
                 }
 
                 status.textContent =
-                    `${payload.count} claim${payload.count === 1 ? "" : "s"} match “${query}”:`;
+                    `${payload.count} claim${payload.count === 1 ? "" : "s"} match “${query}” in ${column}:`;
 
                 payload.results.forEach((claim) => {
                     const card = document.createElement("a");
@@ -93,6 +106,15 @@
                     const idLine = document.createElement("div");
                     idLine.className = "result-id";
                     idLine.textContent = claim["Claim ID"];
+
+                    const scoreLine = document.createElement("div");
+                    scoreLine.className = "result-score";
+                    if (typeof claim.confidence_score === "number") {
+                        scoreLine.textContent =
+                            `Confidence ${claim.confidence_score}/100 · ${claim.evidence_strength || "n/a"}`;
+                    } else {
+                        scoreLine.textContent = "No score available";
+                    }
 
                     const claimLine = document.createElement("div");
                     claimLine.className = "result-claim";
@@ -108,6 +130,7 @@
                     metaLine.textContent = meta.join(" · ") || "No details available";
 
                     card.appendChild(idLine);
+                    card.appendChild(scoreLine);
                     card.appendChild(claimLine);
                     card.appendChild(metaLine);
                     container.appendChild(card);

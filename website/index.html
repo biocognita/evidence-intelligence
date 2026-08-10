@@ -22,6 +22,12 @@
 <div class="searcharea">
     <div class="searchbar">
         <div class="searchbar-row">
+            <select id="search-column" class="searchcolumn">
+                <option value="Claim">Claim</option>
+                <option value="Intervention">Intervention</option>
+                <option value="Outcome">Outcome</option>
+                <option value="Population">Population</option>
+            </select>
             <input
                 id="claim-input"
                 type="search"
@@ -36,7 +42,7 @@
                 >
             </button>
         </div>
-        <p class="search-hint">Try a claim ID like C0001, or a keyword like “melatonin”</p>
+        <p class="search-hint">Try a claim ID like C0001, or search by keyword — pick the field to search on the left</p>
     </div>
 </div>
 

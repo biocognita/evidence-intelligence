@@ -112,6 +112,35 @@ body{
     width: 100%;
 }
 
+/* The column picker dropdown on the left of the search bar */
+.searchcolumn {
+    flex-shrink: 0;
+    padding: 0.85rem 1rem;
+    border: 2px solid #FFE5D9;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    color: #9D8189;
+    background-color: #FFFDFD;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.searchcolumn:focus {
+    border-color: #F4ACB7;
+    box-shadow: 0 0 10px rgba(244, 172, 183, 0.2);
+}
+
+/* Small screens: stack the dropdown above the input instead of squeezing */
+@media (max-width: 560px) {
+    .searchbar-row {
+        flex-wrap: wrap;
+    }
+    .searchcolumn {
+        width: 100%;
+    }
+}
+
 /* 5. The Pill Input Field */
 .searchbarbar {
     width: 100%;
@@ -205,6 +234,20 @@ body{
     letter-spacing: 0.5px;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
+    margin-bottom: 0.6rem;
+}
+
+/* Confidence score + strength line on the card */
+.result-score {
+    display: inline-block;
+    background-color: #D8E2DC;
+    color: #5C6B5E;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    margin-left: 0.5rem;
     margin-bottom: 0.6rem;
 }
 

@@ -59,24 +59,38 @@ def report_page():
     return send_from_directory(WEBSITE_DIR, "reportpage.html")
 
 
-# Column searched by /search. Change this to search a different field
-# (e.g. "Intervention" or "Outcome"); the search is case-insensitive.
+# Column searched by /search when none is given (?col=). The front end
+# offers a picker, so this is just the default.
 SEARCH_COLUMN = "Claim"
+
+# Columns users may search via ?col=. Kept explicit so the front-end
+# dropdown always matches what the backend will accept.
+SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"]
 
 
 @app.route("/search")
 def search_claims():
-    """Case-insensitive substring search over the claim text column.
+    """Case-insensitive substring search over a claim text column.
 
-    Example: /search?q=melatonin returns every claim whose text contains
-    "melatonin". Only the matched subset is serialized to JSON, and the
-    per-request temporaries are released before the response goes out.
+    Examples:
+      /search?q=melatonin                     -> search the Claim text
+      /search?q=melatonin&col=Intervention    -> search the Intervention column
+
+    Only the matched subset is serialized to JSON. Each result is enriched
+    with its confidence score + evidence strength (computed from the cached
+    study data), and per-request temporaries are released before the
+    response goes out.
     """
 
     query = (request.args.get("q") or "").strip()
 
     if not query:
         return jsonify({"error": "Missing query parameter: ?q=<text>"}), 400
+
+    # Validate the requested column; fall back to the default if absent or
+    # not in the whitelist (never trust client input blindly).
+    requested_col = (request.args.get("col") or "").strip()
+    search_column = requested_col if requested_col in SEARCHABLE_COLUMNS else SEARCH_COLUMN
 
     try:
         data = get_data()
@@ -91,12 +105,12 @@ def search_claims():
 
     # Lazy filtering: only rows containing the query (case-insensitive) are
     # materialized, then converted to records for the front end.
-    # astype("string") keeps this working even if SEARCH_COLUMN is a
+    # astype("string") keeps this working even if the searched column is a
     # low-cardinality column (compressed to category dtype), and
     # regex=False treats the query as literal text (a query like "C+"
     # must not be interpreted as a regular expression).
     matched = claims[
-        claims[SEARCH_COLUMN]
+        claims[search_column]
         .astype("string")
         .str.contains(query, case=False, na=False, regex=False)
     ]
@@ -104,11 +118,33 @@ def search_claims():
     # `NaN` literal that to_dict() would leave in the payload).
     results = json.loads(matched.to_json(orient="records"))
 
+    # Enrich each result with its confidence score + strength using the
+    # cached study index (no extra Google Sheets calls). Skip claims with
+    # no studies rather than failing the whole search.
+    for record in results:
+        claim_id = record.get("Claim ID")
+        try:
+            studies = data["study_by_claim"].loc[claim_id]
+        except KeyError:
+            continue
+        try:
+            score, strength, _ = evaluate_claim(record, studies)
+        except Exception:
+            continue
+        record["confidence_score"] = round(score, 2)
+        record["evidence_strength"] = strength
+        del studies
+
     # Aggressive memory reclaim on the 512 MB Render free tier.
     del matched, claims, data
     gc.collect()
 
-    return jsonify({"query": query, "count": len(results), "results": results})
+    return jsonify({
+        "query": query,
+        "column": search_column,
+        "count": len(results),
+        "results": results
+    })
 
 
 @app.route("/claim/<claim_id>")
