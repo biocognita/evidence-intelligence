@@ -8,6 +8,14 @@
      - Beige About Us box on the white canvas
      - Report page: white cards with brown borders in a 2-col
        Overview grid, then stacked study cards with summaries
+
+   Typography follows the golden ratio (phi = 1.618) on a 16px base:
+       0.75rem  micro (badges/pills)
+       0.85rem  small (meta, card labels)
+       1rem     body
+       1.25rem  lead (~phi^0.5)
+       1.6rem   h2       (~phi)
+       2.6rem   h1       (~phi^2)
    ============================================================ */
 
 :root {
@@ -86,7 +94,7 @@ body {
     text-decoration: none;
     color: var(--ink);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 500;
     padding: 0.3rem 0.1rem 0.35rem;
     transition: color 0.2s ease;
@@ -145,7 +153,7 @@ body {
 .home-subtitle {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: #6E5F63;
     margin: 0.7rem 0 0 0;
 }
@@ -264,7 +272,7 @@ body {
 .about-card h2 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 1.6rem;
+    font-size: 1.6rem; /* ~phi */
     color: var(--title-pink);
     margin: 0 0 1.1rem 0;
 }
@@ -272,7 +280,7 @@ body {
 .about-card p {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
-    font-size: 1.02rem;
+    font-size: 1rem; /* body */
     line-height: 1.75;
     color: var(--ink);
     margin: 0;
@@ -292,7 +300,7 @@ body {
 
 .results-status {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.02rem;
+    font-size: 1rem; /* body */
     font-weight: 600;
     color: var(--ink);
     margin: 2rem auto 1.25rem;
@@ -346,7 +354,7 @@ body {
     background-color: #FBEAEA;
     color: var(--title-pink);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.75rem; /* micro */
     font-weight: 700;
     padding: 0.25rem 0.7rem;
     border-radius: 9999px;
@@ -358,7 +366,7 @@ body {
     background-color: #F6F0E2;
     color: #7A6B50;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.75rem; /* micro */
     font-weight: 700;
     padding: 0.25rem 0.7rem;
     border-radius: 9999px;
@@ -368,7 +376,7 @@ body {
 
 .result-claim {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.25rem; /* lead */
     font-weight: 700;
     color: var(--ink);
     margin-bottom: 0.35rem;
@@ -376,7 +384,7 @@ body {
 
 .result-meta {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* small */
     font-weight: 400;
     color: var(--ink-soft);
 }
@@ -396,7 +404,7 @@ body {
     border: 1px solid #F0D9D9;
     color: var(--ink-soft);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.75rem; /* micro */
     font-weight: 600;
     padding: 0.25rem 0.6rem;
     border-radius: 9999px;
@@ -404,7 +412,7 @@ body {
 
 .study-mini-empty {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.85rem; /* small */
     color: #C0B2B5;
 }
 
@@ -437,7 +445,7 @@ body {
     padding: 0.8rem 2.2rem;
     border-radius: 9999px;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 1rem; /* body */
     font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -479,7 +487,7 @@ body {
     border-radius: 1.1rem;
     border: 1px solid var(--border);
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.02rem;
+    font-size: 1rem; /* body */
     font-weight: 500;
     max-width: 35rem;
     text-align: center;
@@ -511,10 +519,10 @@ body {
     padding: 3rem 1.5rem 4rem;
 }
 
-/* Main claim heading — big, bold, dark brown */
+/* Main claim heading — big, bold, dark brown (~phi^2) */
 #claim {
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.3rem;
+    font-size: 2.6rem;
     font-weight: 800;
     line-height: 1.2;
     color: var(--ink);
@@ -524,7 +532,7 @@ body {
 /* Section subheadings (Overview / Information On Individual Studies) */
 .report-section-title {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.15rem;
+    font-size: 1.25rem; /* lead */
     font-weight: 600;
     color: var(--ink);
     margin: 0 0 1.1rem 0;
@@ -555,7 +563,7 @@ body {
 
 .report-card h3 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.85rem; /* small */
     font-weight: 600;
     color: var(--ink-soft);
     margin: 0 0 0.7rem 0;
@@ -563,7 +571,7 @@ body {
 
 .report-card p {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.12rem;
+    font-size: 1.25rem; /* lead */
     font-weight: 600;
     line-height: 1.5;
     color: var(--ink);
@@ -610,14 +618,14 @@ body {
     margin: 0;
     color: var(--ink);
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.15rem;
+    font-size: 1.25rem; /* lead */
     font-weight: 700;
 }
 
 .study-score {
     color: var(--ink-soft);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.85rem; /* small */
     font-weight: 600;
     white-space: nowrap;
 }
@@ -626,7 +634,7 @@ body {
     margin: 0;
     color: var(--ink-soft);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.85rem; /* small */
     font-weight: 400;
     line-height: 1.55;
 }
@@ -693,6 +701,6 @@ body {
     }
 
     #claim {
-        font-size: 1.75rem;
+        font-size: 1.9rem;
     }
 }
