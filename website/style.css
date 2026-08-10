@@ -11,13 +11,13 @@
 :root {
     --header-pink: #F8B4B4;
     --title-pink: #E08888;        /* title + section heading pink */
-    --ink: #5C4D51;               /* dark brown-grey body text */
-    --ink-soft: #8A7D81;
-    --paper: #FFFEFB;             /* white content section */
-    --cream: #FCFCF0;             /* About Us card */
-    --canvas: #F2F0EE;            /* light grey page background */
+    --ink: #5C4D51;               /* dark brown body text */
+    --ink-soft: #9B8A8D;          /* warm taupe secondary text */
+    --paper: #FFFFFF;             /* white content section */
+    --cream: #FCFCF0;             /* About Us card (the beige) */
+    --canvas: #FFFFFF;            /* page background — white, per the mockup */
     --dark-border: #4A3E3D;       /* thin dark border on the search bar */
-    --border: #E5E0D8;
+    --border: #EAE2D8;            /* warm beige border */
     --white: #FFFFFF;
     --shadow-soft: 0 4px 14px rgba(92, 77, 81, 0.06);
     --shadow-lift: 0 10px 28px rgba(92, 77, 81, 0.10);
@@ -178,7 +178,7 @@ body {
 }
 
 .searchbarbar::placeholder {
-    color: #A79DA0;
+    color: #B3A5A8;
 }
 
 .searchbarbar:focus {
@@ -326,8 +326,8 @@ body {
 
 .result-score {
     align-self: flex-start;
-    background-color: #EEF1EC;
-    color: #5F7260;
+    background-color: #F6F0E2;
+    color: #7A6B50;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.72rem;
     font-weight: 700;
@@ -376,7 +376,7 @@ body {
 .study-mini-empty {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
-    color: #B9AEB1;
+    color: #C0B2B5;
 }
 
 /* Highlighted search match */
@@ -455,6 +455,19 @@ body {
     max-width: 35rem;
     text-align: center;
     margin: 2rem auto;
+}
+
+/* "No claims found" / empty states on the search page get the same
+   bar treatment as the injected error messages above. */
+.results-status.is-bar {
+    background-color: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 1.1rem;
+    border: 1px solid var(--border);
+    max-width: 35rem;
+    text-align: center;
+    margin: 2rem auto;
+    font-weight: 500;
 }
 
 /* ============ Report page ============ */

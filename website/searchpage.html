@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=8" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=10" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -28,12 +28,6 @@
             <div class="home-inner">
                 <div class="searcharea">
                     <div class="searchbar-row">
-                        <select id="search-column" class="searchcolumn">
-                            <option value="Claim">Claim</option>
-                            <option value="Intervention">Intervention</option>
-                            <option value="Outcome">Outcome</option>
-                            <option value="Population">Population</option>
-                        </select>
                         <input
                             id="claim-input"
                             type="search"
@@ -47,6 +41,12 @@
                                 class="searchbutton"
                             >
                         </button>
+                        <select id="search-column" class="searchcolumn" title="Search column">
+                            <option value="Claim">Claim</option>
+                            <option value="Intervention">Intervention</option>
+                            <option value="Outcome">Outcome</option>
+                            <option value="Population">Population</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -84,18 +84,26 @@
 
             // Shared rendering: appends cards, updates status + buttons.
             // Used by both the cache-hit and network paths so they can
-            // never drift out of sync.
-            function renderResults(results, total, fromCache) {
-                const status = document.getElementById("results-status");
+            // never drift out of sync.                // Status-line helper: normal messages are plain text,
+                // empty/error states get the bar treatment (like the
+                // injected server-error bars).
+                function setStatus(message, bar = false) {
+                    const el = document.getElementById("results-status");
+                    el.textContent = message;
+                    el.classList.toggle("is-bar", bar);
+                }
+
+                function renderResults(results, total, fromCache) {
                 const container = document.getElementById("results");
                 const loadMoreBtn = document.getElementById("load-more");
                 const refreshBtn = document.getElementById("refresh");
 
                 const shown = currentOffset + results.length;
                 const suffix = fromCache ? " (cached)" : "";
-                status.textContent =
+                setStatus(
                     `Showing ${shown} of ${total} claim${total === 1 ? "" : "s"} ` +
-                    `matching “${currentQuery}” in ${currentColumn}:${suffix}`;
+                    `matching “${currentQuery}” in ${currentColumn}:${suffix}`
+                );
 
                 results.forEach((claim) => {
                     container.appendChild(renderResultCard(claim));
@@ -189,7 +197,6 @@
                 }
 
                 const params = new URLSearchParams(window.location.search);
-                const status = document.getElementById("results-status");
                 const container = document.getElementById("results");
 
                 if (reset) {
@@ -207,8 +214,10 @@
                     document.getElementById("search-column").value = currentColumn;
 
                     if (!currentQuery) {
-                        status.textContent =
-                            "Type a keyword above to search the claim database.";
+                        setStatus(
+                            "Type a keyword above to search the claim database.",
+                            true
+                        );
                         loadMoreBtn.hidden = true;
                         isLoading = false;
                         loadMoreBtn.textContent = "Load more results";
@@ -216,7 +225,7 @@
                     }
 
                     container.innerHTML = "";
-                    status.textContent = "Searching…";
+                    setStatus("Searching…");
 
                     // Cache hit: render instantly, skip the network round-trip
                     const cached = readCache(searchCacheKey());
@@ -243,9 +252,11 @@
                     }
                     payload = await response.json();
                 } catch (err) {
-                    status.textContent =
+                    setStatus(
                         "Couldn't reach the Evidence Intelligence server. " +
-                        "Make sure the server is running.";
+                        "Make sure the server is running.",
+                        true
+                    );
                     loadMoreBtn.hidden = true;
                     isLoading = false;
                     loadMoreBtn.textContent = "Load more results";
@@ -253,8 +264,10 @@
                 }
 
                 if (payload.total === 0) {
-                    status.textContent =
-                        `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`;
+                    setStatus(
+                        `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`,
+                        true
+                    );
                     loadMoreBtn.hidden = true;
                     isLoading = false;
                     loadMoreBtn.textContent = "Load more results";
