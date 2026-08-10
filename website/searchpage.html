@@ -59,6 +59,7 @@
             let currentColumn = "Claim";
             let currentOffset = 0;
             let hasMore = false;
+            let isLoading = false;
 
             function renderStudyBreakdown(breakdown) {
                 const wrapper = document.createElement("div");
@@ -123,6 +124,17 @@
 
             async function loadSearchResults(reset = true) {
 
+                // Guard against double-clicking Load more: two concurrent
+                // fetches would append the same page twice.
+                if (isLoading) {
+                    return;
+                }
+                isLoading = true;
+                const loadMoreBtn = document.getElementById("load-more");
+                if (!reset) {
+                    loadMoreBtn.textContent = "Loading more…";
+                }
+
                 const params = new URLSearchParams(window.location.search);
 
                 if (reset) {
@@ -139,12 +151,13 @@
 
                 const status = document.getElementById("results-status");
                 const container = document.getElementById("results");
-                const loadMoreBtn = document.getElementById("load-more");
 
                 if (!currentQuery) {
                     status.textContent =
                         "Type a keyword above to search the claim database.";
                     loadMoreBtn.hidden = true;
+                    isLoading = false;
+                    loadMoreBtn.textContent = "Load more results";
                     return;
                 }
 
@@ -170,6 +183,8 @@
                         "Couldn't reach the Evidence Intelligence server. " +
                         "Make sure the server is running.";
                     loadMoreBtn.hidden = true;
+                    isLoading = false;
+                    loadMoreBtn.textContent = "Load more results";
                     return;
                 }
 
@@ -181,6 +196,8 @@
                     status.textContent =
                         `No claims match “${currentQuery}” in ${currentColumn}. Try another keyword.`;
                     loadMoreBtn.hidden = true;
+                    isLoading = false;
+                    loadMoreBtn.textContent = "Load more results";
                     return;
                 }
 
@@ -196,6 +213,8 @@
                 hasMore = payload.has_more;
                 currentOffset = shown;
                 loadMoreBtn.hidden = !hasMore;
+                loadMoreBtn.textContent = "Load more results";
+                isLoading = false;
             }
 
             document.getElementById("load-more").addEventListener("click", () => {
