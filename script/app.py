@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import gc
+import json
 import os
 import time
 
@@ -56,6 +57,52 @@ def home():
 @app.route("/reportpage.html")
 def report_page():
     return send_from_directory(WEBSITE_DIR, "reportpage.html")
+
+
+# Column searched by /search. Change this to search a different field
+# (e.g. "Intervention" or "Outcome"); the search is case-insensitive.
+SEARCH_COLUMN = "Claim"
+
+
+@app.route("/search")
+def search_claims():
+    """Case-insensitive substring search over the claim text column.
+
+    Example: /search?q=melatonin returns every claim whose text contains
+    "melatonin". Only the matched subset is serialized to JSON, and the
+    per-request temporaries are released before the response goes out.
+    """
+
+    query = (request.args.get("q") or "").strip()
+
+    if not query:
+        return jsonify({"error": "Missing query parameter: ?q=<text>"}), 400
+
+    try:
+        data = get_data()
+    except Exception:
+        app.logger.exception("Failed to load evidence database from Google Sheets")
+        return jsonify({
+            "error": "Couldn't load the evidence database from Google Sheets. "
+                     "Please try again later."
+        }), 503
+
+    claims = data["claim_data"]
+
+    # Lazy filtering: only rows containing the query (case-insensitive) are
+    # materialized, then converted to records for the front end.
+    matched = claims[
+        claims[SEARCH_COLUMN].str.contains(query, case=False, na=False)
+    ]
+    # to_json() emits `null` for NaN/empty cells (browsers reject the raw
+    # `NaN` literal that to_dict() would leave in the payload).
+    results = json.loads(matched.to_json(orient="records"))
+
+    # Aggressive memory reclaim on the 512 MB Render free tier.
+    del matched, claims, data
+    gc.collect()
+
+    return jsonify({"query": query, "count": len(results), "results": results})
 
 
 @app.route("/claim/<claim_id>")
