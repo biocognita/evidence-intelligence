@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=11" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=12" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -31,7 +31,7 @@
                         <input
                             id="claim-input"
                             type="search"
-                            placeholder="Search here..."
+                            placeholder="Search for a claim..."
                             class="searchbarbar"
                         >
                         <button id="search-button" type="button">
@@ -41,12 +41,6 @@
                                 class="searchbutton"
                             >
                         </button>
-                        <select id="search-column" class="searchcolumn" title="Search column">
-                            <option value="Claim">Claim</option>
-                            <option value="Intervention">Intervention</option>
-                            <option value="Outcome">Outcome</option>
-                            <option value="Population">Population</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -209,9 +203,8 @@
                     cachedResults = [];
                     document.getElementById("refresh").hidden = true;
 
-                    // Prefill the search box + column picker so users can refine
+                    // Prefill the search box so users can refine
                     document.getElementById("claim-input").value = currentQuery;
-                    document.getElementById("search-column").value = currentColumn;
 
                     if (!currentQuery) {
                         setStatus(

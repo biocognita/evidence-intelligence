@@ -143,26 +143,6 @@ body {
     width: 100%;
 }
 
-/* Column picker (right of the button) — small pill, same border */
-.searchcolumn {
-    flex-shrink: 0;
-    padding: 0.72rem 1rem;
-    border: 1px solid var(--dark-border);
-    border-radius: 9999px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink);
-    background-color: var(--white);
-    outline: none;
-    cursor: pointer;
-    transition: box-shadow 0.2s ease;
-}
-
-.searchcolumn:focus {
-    box-shadow: 0 0 0 3px rgba(224, 136, 136, 0.25);
-}
-
 /* Elongated input, thin dark border */
 .searchbarbar {
     flex: 1;
@@ -641,14 +621,9 @@ body {
         flex-wrap: wrap;
     }
 
-    /* Keep input on its own row; button + select share the next one
-       (instead of a lone floating button). */
+    /* Input keeps its full row; the round button drops below it. */
     .searchbarbar {
         flex: 1 0 100%;
-    }
-
-    .searchcolumn {
-        margin-left: auto;
     }
 
     .nav-links {
