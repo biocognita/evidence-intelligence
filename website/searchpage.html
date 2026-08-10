@@ -150,10 +150,11 @@
                     scoreLine.textContent = "No score available";
                 }
 
-                // Claim text with the matching substring highlighted
+                // Claim text in Title Case (owner's preference) with the
+                // matching substring highlighted
                 const claimLine = document.createElement("div");
                 claimLine.className = "result-claim";
-                claimLine.appendChild(highlightText(claim["Claim"] || "", currentQuery));
+                claimLine.appendChild(highlightText(toTitleCase(claim["Claim"] || ""), currentQuery));
 
                 // Meta line: also highlight the query wherever it appears
                 const metaLine = document.createElement("div");

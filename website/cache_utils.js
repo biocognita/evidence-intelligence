@@ -57,6 +57,18 @@ function clearCache(key) {
     }
 }
 
+// ----- Display helpers -----
+
+// The project's claims read better in Title Case (the owner's preference),
+// so capitalize the first letter of every word: "Melatonin improves sleep
+// quality" -> "Melatonin Improves Sleep Quality". Non-letters (IDs,
+// numbers, dashes) are left untouched.
+function toTitleCase(text) {
+    return String(text || "").replace(/\w\S*/g, (word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+}
+
 // ----- XSS-safe match highlighting -----
 
 // Splits `text` into plain text nodes and <mark> elements so the query can

@@ -78,10 +78,11 @@
                 const populationEl = document.getElementById("population");
                 const interventionEl = document.getElementById("intervention");
 
-                // Highlight the search query in the free-text fields (safe:
-                // highlightText builds text nodes + <mark>, never HTML).
+                // Claim heading in Title Case (owner's preference), with the
+                // search query still highlighted (safe: highlightText builds
+                // text nodes + <mark>, never HTML).
                 claimEl.textContent = "";
-                claimEl.appendChild(highlightText(report.claim || "", query));
+                claimEl.appendChild(highlightText(toTitleCase(report.claim || ""), query));
                 populationEl.textContent = "";
                 populationEl.appendChild(highlightText(report.population || "", query));
                 interventionEl.textContent = "";
