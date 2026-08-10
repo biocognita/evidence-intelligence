@@ -1,11 +1,13 @@
 /* ============================================================
    Evidence Intelligence — design system
-   Matches the reference mockup:
+   Matches the reference mockups:
      - Montserrat everywhere (400 / 500 / 600 / 700 / 800)
      - Light pink header bar, logo far left, nav far right
-     - White hero, LEFT-aligned: big pink title (2 lines),
+     - Home: white hero, LEFT-aligned: big pink title (2 lines),
        subtitle, search bar (thin dark border + round pink btn)
-     - Cream About Us box on the grey canvas below
+     - Beige About Us box on the white canvas
+     - Report page: white cards with brown borders in a 2-col
+       Overview grid, then stacked study cards with summaries
    ============================================================ */
 
 :root {
@@ -472,89 +474,115 @@ body {
 
 /* ============ Report page ============ */
 
-.EvIntReport {
+/* Page canvas stays white; the report sits on it with brown-bordered
+   white cards exactly like the mockup. */
+
+.report-main {
     width: 100%;
-    max-width: 44rem;
-    display: flex;
-    flex-direction: column;
+    max-width: 54rem;
     margin: 0 auto;
-    padding: 2rem 1.5rem 0;
+    padding: 3rem 1.5rem 4rem;
 }
 
+/* Main claim heading — big, bold, dark brown */
 #claim {
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.2rem;
+    font-size: 2.3rem;
     font-weight: 800;
+    line-height: 1.2;
     color: var(--ink);
-    margin: 1.5rem 0 2rem 0;
+    margin: 0 0 2.25rem 0;
 }
 
-.EvIntReport h3 {
-    background-color: var(--white);
-    padding: 1.4rem 1.5rem 0.25rem 1.5rem;
-    margin: 0;
-    border-radius: 1.1rem 1.1rem 0 0;
-    border: 1px solid var(--border);
-    border-bottom: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--ink-soft);
-}
-
-.EvIntReport p {
-    background-color: var(--white);
-    padding: 0 1.5rem 1.4rem 1.5rem;
-    margin: 0 0 1.4rem 0;
-    border-radius: 0 0 1.1rem 1.1rem;
-    border: 1px solid var(--border);
-    border-top: none;
-    box-shadow: var(--shadow-soft);
+/* Section subheadings (Overview / Information On Individual Studies) */
+.report-section-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--ink);
+    margin: 0 0 1.1rem 0;
 }
 
-.EvIntReport + div {
-    width: 100%;
-    max-width: 44rem;
-    margin: 0 auto 2rem;
-    padding: 0 1.5rem;
+/* Overview grid: 2 columns (mockup's 2x2 + full-width card) */
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin-bottom: 2.5rem;
 }
 
-.EvIntReport + div h2 {
+/* Rounded white card with a brown border — the mockup look */
+.report-card {
+    background-color: var(--white);
+    border: 1px solid var(--dark-border);
+    border-radius: 1rem;
+    padding: 1.4rem 1.5rem;
+    min-width: 0;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.report-card:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+}
+
+.report-card h3 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 1.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-soft);
+    margin: 0 0 0.7rem 0;
 }
+
+.report-card p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Supporting Studies spans the whole row (full-width card) */
+.report-card-full {
+    grid-column: 1 / -1;
+}
+
+/* ============ Study cards (Information On Individual Studies) ============ */
 
 #breakdown {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1.1rem;
 }
 
 .study-card {
     background-color: var(--white);
-    border-radius: 1.1rem;
+    border: 1px solid var(--dark-border);
+    border-radius: 1rem;
     padding: 1.3rem 1.5rem;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border);
-    border-left: 5px solid var(--header-pink);
-    transition: transform 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .study-card:hover {
+    box-shadow: var(--shadow-soft);
     transform: translateY(-2px);
 }
 
+.study-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
+}
+
 .studyID {
-    margin: 0 0 0.4rem 0;
+    margin: 0;
     color: var(--ink);
     font-family: 'Montserrat', sans-serif;
     font-size: 1.15rem;
@@ -562,11 +590,32 @@ body {
 }
 
 .study-score {
+    color: var(--ink-soft);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.study-summary {
     margin: 0;
     color: var(--ink-soft);
     font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
     font-weight: 400;
+    line-height: 1.55;
+}
+
+.report-empty {
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    color: var(--ink-soft);
+    margin: 0;
 }
 
 /* ============ Mobile ============ */
@@ -612,5 +661,18 @@ body {
 
     .nav-inner {
         padding: 0.7rem 1.25rem;
+    }
+
+    /* Report page: stack the overview cards on one column */
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-card-full {
+        grid-column: 1 / -1;
+    }
+
+    #claim {
+        font-size: 1.75rem;
     }
 }

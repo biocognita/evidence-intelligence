@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=10" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=11" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -25,28 +25,42 @@
             </div>
         </nav>
 
-        <div class="EvIntReport">
+        <main class="report-main">
             <h1 id="claim"></h1>
 
-            <h3>Confidence Score</h3>
-            <p id="score"></p>
+            <h2 class="report-section-title">Overview</h2>
 
-            <h3>Evidence Strength</h3>
-            <p id="strength"></p>
+            <div class="report-grid">
+                <section class="report-card">
+                    <h3>Evidence Strength</h3>
+                    <p id="strength"></p>
+                </section>
 
-            <h3>Population</h3>
-            <p id="population"></p>
+                <section class="report-card">
+                    <h3>Our Confidence Levels</h3>
+                    <p id="score"></p>
+                </section>
 
-            <h3>Intervention</h3>
-            <p id="intervention"></p>
+                <section class="report-card">
+                    <h3>Population</h3>
+                    <p id="population"></p>
+                </section>
 
-            <h3>Supporting Studies</h3>
-            <p id="studies"></p>
-        </div>
-        <div>
-            <h2>Study Breakdown</h2>
+                <section class="report-card">
+                    <h3>Intervention</h3>
+                    <p id="intervention"></p>
+                </section>
+
+                <section class="report-card report-card-full">
+                    <h3>Supporting Studies</h3>
+                    <p id="studies"></p>
+                </section>
+            </div>
+
+            <h2 class="report-section-title">Information On Individual Studies</h2>
             <div id="breakdown"></div>
-        </div>
+        </main>
+
         <script src="api_config.js"></script>
         <script src="cache_utils.js"></script>
         <script>
@@ -88,27 +102,38 @@
 
                 if (report.study_breakdown && report.study_breakdown.length > 0) {
                     report.study_breakdown.forEach((study) => {
-                        // Create a wrapper div block for this individual study
+                        // One white, brown-bordered card per study
                         const studyCard = document.createElement("div");
                         studyCard.className = "study-card";
+
+                        const header = document.createElement("div");
+                        header.className = "study-card-header";
 
                         const idHeading = document.createElement("h3");
                         idHeading.className = "studyID";
                         idHeading.textContent = study.study_id;
 
-                        const scoreLine = document.createElement("p");
-                        scoreLine.className = "study-score";
-                        scoreLine.textContent = `Quality Score: ${study.quality_score}/100`;
+                        const scoreBadge = document.createElement("span");
+                        scoreBadge.className = "study-score";
+                        scoreBadge.textContent = `Quality ${study.quality_score}/100`;
 
-                        // Append the text elements into the white card block
-                        studyCard.appendChild(idHeading);
-                        studyCard.appendChild(scoreLine);
+                        header.appendChild(idHeading);
+                        header.appendChild(scoreBadge);
 
-                        // Append the finished card block into the main layout container
+                        const summary = document.createElement("p");
+                        summary.className = "study-summary";
+                        summary.textContent = study.summary || "Study details not available";
+
+                        studyCard.appendChild(header);
+                        studyCard.appendChild(summary);
+
                         breakdownContainer.appendChild(studyCard);
                     });
                 } else {
-                    breakdownContainer.textContent = "No study breakdown available.";
+                    const none = document.createElement("p");
+                    none.className = "report-empty";
+                    none.textContent = "No study breakdown available.";
+                    breakdownContainer.appendChild(none);
                 }
             }
 

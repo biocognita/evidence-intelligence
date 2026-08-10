@@ -9,7 +9,7 @@ from data_loader import load_database
 from claim_loader import load_claim_database
 from claim_lookup import build_claims_index
 from claim_evaluation import evaluate_claim
-from claim_report import generate_claim_report
+from claim_report import generate_claim_report, build_study_breakdown
 
 WEBSITE_DIR = os.path.join(os.path.dirname(__file__), "..", "website")
 
@@ -161,10 +161,7 @@ def search_claims():
             continue
         record["confidence_score"] = round(score, 2)
         record["evidence_strength"] = strength
-        record["study_breakdown"] = [
-            {"study_id": study_id, "quality_score": round(qs, 2)}
-            for study_id, qs in zip(studies["Study ID"].tolist(), study_scores)
-        ]
+        record["study_breakdown"] = build_study_breakdown(studies, study_scores)
         del studies, study_scores
 
     # Aggressive memory reclaim on the 512 MB Render free tier.
