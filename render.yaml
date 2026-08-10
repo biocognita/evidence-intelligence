@@ -15,7 +15,12 @@ services:
     runtime: python
     rootDir: .
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --chdir script app:app
+    # Render free tier = 512 MB RAM. Exactly ONE worker keeps memory flat;
+    # 2 threads inside that worker handle concurrent requests without
+    # spawning extra processes. --max-requests recycles the worker after
+    # 500 requests so slow pandas/gspread memory creep is periodically
+    # flushed instead of accumulating until OOM.
+    startCommand: gunicorn --chdir script --workers 1 --threads 2 --max-requests 500 --max-requests-jitter 100 --timeout 120 app:app
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
