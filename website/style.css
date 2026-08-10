@@ -141,7 +141,7 @@ body {
     width: 100%;
 }
 
-/* Column picker (left of input) — small pill, same border */
+/* Column picker (right of the button) — small pill, same border */
 .searchcolumn {
     flex-shrink: 0;
     padding: 0.72rem 1rem;
@@ -211,7 +211,7 @@ body {
     filter: brightness(0.4);
 }
 
-/* ============ About Us (cream box on the grey canvas) ============ */
+/* ============ About Us (beige box on the white canvas) ============ */
 
 .about-section {
     background-color: var(--canvas);
@@ -592,8 +592,14 @@ body {
         flex-wrap: wrap;
     }
 
+    /* Keep input on its own row; button + select share the next one
+       (instead of a lone floating button). */
+    .searchbarbar {
+        flex: 1 0 100%;
+    }
+
     .searchcolumn {
-        width: 100%;
+        margin-left: auto;
     }
 
     .nav-links {
