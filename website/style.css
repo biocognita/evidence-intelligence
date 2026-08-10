@@ -382,6 +382,26 @@ body {
 .chip-query {
     background-color: #FBEAEA;
     color: var(--title-pink);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.chip-query:hover {
+    background-color: #FBDADA;
+    transform: translateY(-1px);
+}
+
+.chip-query:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
+}
+
+/* Hint that the chip is clickable */
+.chip-query::after {
+    content: " ↩";
+    font-size: 0.75rem;
+    opacity: 0.65;
 }
 
 .chip-count {
@@ -518,6 +538,18 @@ body {
     border-radius: 4px;
     padding: 0 0.15rem;
     font-weight: 700;
+    transition: opacity 0.45s ease, background-color 0.45s ease;
+}
+
+/* Fading out before the highlights are unwrapped to plain text */
+.match-highlight--fading {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .match-highlight {
+        transition: none;
+    }
 }
 
 /* Action buttons (Refresh + Load more) */

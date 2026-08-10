@@ -71,23 +71,59 @@ function toTitleCase(text) {
 
 // ----- Match-highlight dismissal -----
 
-// Once the user clicks anywhere on the page, the search-match highlights
-// politely remove themselves (they were only a "here's why this matched"
-// hint). Marks are unwrapped back into plain text nodes.
+// The search-match highlights are a "here's why this matched" hint, not
+// decoration: they remove themselves on the first click, on scroll, or
+// after a few seconds — and can be brought back by clicking the query
+// chip on the results page.
 
 let matchHighlightsDismissed = false;
+let matchHighlightTimer = null;
 
-function dismissMatchHighlights() {
-    matchHighlightsDismissed = true;
+function unwrapHighlightMarks() {
     document.querySelectorAll("mark.match-highlight").forEach((mark) => {
         const text = document.createTextNode(mark.textContent);
         mark.replaceWith(text);
     });
 }
 
-// Call once per page: the first click anywhere dismisses the highlights.
+// Fade the marks out (opacity 0, via CSS transition), then unwrap them
+// back into plain text. Reduced-motion users skip the animation.
+function dismissMatchHighlights() {
+    matchHighlightsDismissed = true;
+    if (matchHighlightTimer) {
+        clearTimeout(matchHighlightTimer);
+        matchHighlightTimer = null;
+    }
+    const marks = document.querySelectorAll("mark.match-highlight");
+    if (!marks.length) {
+        return;
+    }
+    const reduceMotion = window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+        unwrapHighlightMarks();
+        return;
+    }
+    marks.forEach((mark) => mark.classList.add("match-highlight--fading"));
+    setTimeout(unwrapHighlightMarks, 450);
+}
+
+// Call once per page: dismiss on first click, first scroll, or after 8
+// seconds so highlights never linger.
 function initMatchHighlightDismissal() {
     document.addEventListener("click", dismissMatchHighlights, { once: true });
+    document.addEventListener("scroll", dismissMatchHighlights, { once: true, passive: true });
+    matchHighlightTimer = setTimeout(dismissMatchHighlights, 8000);
+}
+
+// Re-arm the one-shot dismissal (used after re-highlighting via the chip).
+function armHighlightDismissal() {
+    document.addEventListener("click", dismissMatchHighlights, { once: true });
+    document.addEventListener("scroll", dismissMatchHighlights, { once: true, passive: true });
+    if (matchHighlightTimer) {
+        clearTimeout(matchHighlightTimer);
+    }
+    matchHighlightTimer = setTimeout(dismissMatchHighlights, 8000);
 }
 
 // After rendering new content (e.g. "Load more" cards), strip highlights
@@ -97,10 +133,7 @@ function purgeDismissedHighlights() {
     if (!matchHighlightsDismissed) {
         return;
     }
-    document.querySelectorAll("mark.match-highlight").forEach((mark) => {
-        const text = document.createTextNode(mark.textContent);
-        mark.replaceWith(text);
-    });
+    unwrapHighlightMarks();
 }
 
 // ----- XSS-safe match highlighting -----

@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=19" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=20" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -49,7 +49,12 @@
             <div class="results-header-inner">
                 <div class="results-title-row">
                     <h2 class="results-title">Search Results</h2>
-                    <span class="result-chip chip-query" id="chip-query"></span>
+                    <button
+                        type="button"
+                        class="result-chip chip-query"
+                        id="chip-query"
+                        title="Re-highlight the matches"
+                    ></button>
                 </div>
                 <div class="results-status-row">
                     <span class="result-chip chip-count" id="chip-count"></span>
@@ -110,6 +115,18 @@
                         total === 0
                             ? "No claims"
                             : `${count} of ${total} claim${total === 1 ? "" : "s"}`;
+                }
+
+                // Re-render every accumulated card with the query
+                // highlighted again (used by the query chip).
+                function reHighlightResults() {
+                    matchHighlightsDismissed = false;
+                    const container = document.getElementById("results");
+                    container.innerHTML = "";
+                    cachedResults.forEach((claim) => {
+                        container.appendChild(renderResultCard(claim));
+                    });
+                    armHighlightDismissal();
                 }
 
                 function renderResults(results, total) {
@@ -314,6 +331,9 @@
             document.getElementById("load-more").addEventListener("click", () => {
                 loadSearchResults(false);
             });
+
+            // Clicking the query chip brings the highlights back.
+            document.getElementById("chip-query").addEventListener("click", reHighlightResults);
 
             // Manual refresh: drop the cached entry and re-fetch fresh data.
             // ?fresh=1 also bypasses the cache on page load (used here and
