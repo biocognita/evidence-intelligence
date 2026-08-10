@@ -69,6 +69,40 @@ function toTitleCase(text) {
     });
 }
 
+// ----- Match-highlight dismissal -----
+
+// Once the user clicks anywhere on the page, the search-match highlights
+// politely remove themselves (they were only a "here's why this matched"
+// hint). Marks are unwrapped back into plain text nodes.
+
+let matchHighlightsDismissed = false;
+
+function dismissMatchHighlights() {
+    matchHighlightsDismissed = true;
+    document.querySelectorAll("mark.match-highlight").forEach((mark) => {
+        const text = document.createTextNode(mark.textContent);
+        mark.replaceWith(text);
+    });
+}
+
+// Call once per page: the first click anywhere dismisses the highlights.
+function initMatchHighlightDismissal() {
+    document.addEventListener("click", dismissMatchHighlights, { once: true });
+}
+
+// After rendering new content (e.g. "Load more" cards), strip highlights
+// if the user already dismissed them, so freshly-added cards match the
+// rest of the page.
+function purgeDismissedHighlights() {
+    if (!matchHighlightsDismissed) {
+        return;
+    }
+    document.querySelectorAll("mark.match-highlight").forEach((mark) => {
+        const text = document.createTextNode(mark.textContent);
+        mark.replaceWith(text);
+    });
+}
+
 // ----- XSS-safe match highlighting -----
 
 // Splits `text` into plain text nodes and <mark> elements so the query can

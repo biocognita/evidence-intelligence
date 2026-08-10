@@ -130,6 +130,10 @@
                 loadMoreBtn.hidden = !hasMore;
                 loadMoreBtn.textContent = "Load more results";
                 refreshBtn.hidden = false;
+
+                // If the user already clicked (dismissing highlights),
+                // strip them from any freshly loaded cards too.
+                purgeDismissedHighlights();
             }
 
             function renderStudyBreakdown(breakdown) {
@@ -322,6 +326,10 @@
             });
 
             loadSearchResults(true);
+
+            // The first click anywhere on the page removes the match
+            // highlights (they're a hint, not decoration).
+            initMatchHighlightDismissal();
         </script>
     </body>
 </html>

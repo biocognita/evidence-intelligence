@@ -290,6 +290,10 @@
             }
 
             loadReport();
+
+            // The first click anywhere on the page removes the match
+            // highlights (they're a hint, not decoration).
+            initMatchHighlightDismissal();
         </script>
     </body>
 </html>
