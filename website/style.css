@@ -193,11 +193,17 @@ body {
     filter: brightness(0.4);
 }
 
-/* ============ About Us (beige box on the white canvas) ============ */
+/* ============ About Us + Methodology (beige boxes on white) ============ */
 
 .about-section {
     background-color: var(--canvas);
     padding: 2.75rem 1.5rem 4.5rem;
+}
+
+/* The About card's generous bottom padding is the gap between the two
+   cards, so the Methodology section starts flush under it. */
+.methodology-section {
+    padding-top: 0;
 }
 
 .about-inner {
