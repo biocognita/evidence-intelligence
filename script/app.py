@@ -91,8 +91,14 @@ def search_claims():
 
     # Lazy filtering: only rows containing the query (case-insensitive) are
     # materialized, then converted to records for the front end.
+    # astype("string") keeps this working even if SEARCH_COLUMN is a
+    # low-cardinality column (compressed to category dtype), and
+    # regex=False treats the query as literal text (a query like "C+"
+    # must not be interpreted as a regular expression).
     matched = claims[
-        claims[SEARCH_COLUMN].str.contains(query, case=False, na=False)
+        claims[SEARCH_COLUMN]
+        .astype("string")
+        .str.contains(query, case=False, na=False, regex=False)
     ]
     # to_json() emits `null` for NaN/empty cells (browsers reject the raw
     # `NaN` literal that to_dict() would leave in the payload).
