@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=18" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=21" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -128,19 +128,33 @@
             }
 
             // Swap the skeleton screen for the real report once data
-            // arrives (from cache or the server).
+            // arrives (from cache or the server). Instead of a hard cut,
+            // the skeleton flips to an overlay and fades away while the
+            // report rises in beneath it — a soft cross-fade.
             function showReport() {
                 const skeleton = document.getElementById("report-skeleton");
-                if (skeleton) {
-                    skeleton.remove();
-                }
-                ["claim", "strength", "score", "population", "intervention", "studies"].forEach((id) => {
-                    document.getElementById(id).hidden = false;
-                });
-                document.querySelectorAll(".report-section-title").forEach((el) => {
+
+                // Reveal the real content with the rise-in animation.
+                // (It's unhidden before the skeleton fades, so the page
+                // keeps its height — no collapse, no jump.)
+                const reveal = (el) => {
                     el.hidden = false;
-                });
+                    el.classList.add("report-reveal");
+                };
+                reveal(document.getElementById("claim"));
+                document.querySelectorAll(".report-section-title").forEach(reveal);
+                document.querySelectorAll(".report-card").forEach(reveal);
                 document.getElementById("breakdown").hidden = false;
+
+                if (skeleton) {
+                    // Fade the skeleton out on top of the arriving content.
+                    skeleton.classList.add("sk-leaving");
+                    const finish = () => skeleton.remove();
+                    skeleton.addEventListener("transitionend", finish, { once: true });
+                    // Safety net: if the transition never fires (e.g.
+                    // reduced-motion users get an instant swap), remove it.
+                    setTimeout(finish, 600);
+                }
             }
 
             // Fill every section of the report page. `fromCache` only
@@ -175,10 +189,12 @@
                 breakdownContainer.innerHTML = "";
 
                 if (report.study_breakdown && report.study_breakdown.length > 0) {
-                    report.study_breakdown.forEach((study) => {
+                    report.study_breakdown.forEach((study, index) => {
                         // One white, brown-bordered card per study
                         const studyCard = document.createElement("div");
-                        studyCard.className = "study-card";
+                        studyCard.className = "study-card report-reveal";
+                        // Stagger the study cards in after the overview grid
+                        studyCard.style.animationDelay = `${120 + index * 70}ms`;
 
                         const header = document.createElement("div");
                         header.className = "study-card-header";

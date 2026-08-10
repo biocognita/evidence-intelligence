@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=20" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=21" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -138,8 +138,14 @@
                 showResultsHeader(shown, total);
                 setStatus(`in ${currentColumn}`);
 
-                results.forEach((claim) => {
-                    container.appendChild(renderResultCard(claim));
+                // Stagger the cards in so a full page of results sweeps in
+                // gently instead of popping in all at once. Cap the delay
+                // so a 20-card page doesn't crawl for a full second.
+                results.forEach((claim, index) => {
+                    const card = renderResultCard(claim);
+                    card.classList.add("report-reveal");
+                    card.style.animationDelay = `${Math.min(index * 45, 450)}ms`;
+                    container.appendChild(card);
                 });
 
                 currentOffset = shown;

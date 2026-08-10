@@ -301,6 +301,17 @@ body {
         transform: none;
         transition: none;
     }
+
+    .report-reveal,
+    .home-title,
+    .home-subtitle,
+    .home-main .searcharea {
+        animation: none;
+    }
+
+    #report-skeleton.sk-leaving {
+        transition: none;
+    }
 }
 
 .about-card h2 {
@@ -644,6 +655,7 @@ body {
     max-width: 54rem;
     margin: 0 auto;
     padding: 3rem 1.5rem 4rem;
+    position: relative; /* anchor for the fading skeleton overlay */
 }
 
 /* ============ Skeleton screen (report loading) ============ */
@@ -757,6 +769,57 @@ body {
     height: 0.85rem;
     width: 72%;
     border-radius: 0.35rem;
+}
+
+/* When the report is ready, the skeleton flips to an overlay covering the
+   content area and fades away, so the swap is a soft cross-fade rather
+   than a hard cut. The JS holds the page height so nothing collapses. */
+#report-skeleton.sk-leaving {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1; /* paint above the rising content during the cross-fade */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* ============ Entrance animations ============ */
+
+/* Gentle rise-and-fade used for the report reveal, the search cards,
+   and the home hero. `backwards` fill keeps things hidden during the
+   delay, then lets elements return to their natural styles afterwards
+   (so :hover transforms like the card lift still work). */
+.report-reveal {
+    animation: rise-in 0.5s ease backwards;
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Home hero: title, subtitle, then the search bar drift in one after
+   the other on page load. */
+.home-title,
+.home-subtitle,
+.home-main .searcharea {
+    animation: rise-in 0.55s ease backwards;
+}
+
+.home-subtitle {
+    animation-delay: 0.1s;
+}
+
+.home-main .searcharea {
+    animation-delay: 0.2s;
 }
 
 /* Main claim heading — big, bold, dark brown (~phi^2) */
