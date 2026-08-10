@@ -1,33 +1,22 @@
 /* ============================================================
    Evidence Intelligence — design system
-   Palette (from the reference design):
-     --header-pink  #F8B4B4   solid pastel header bar
-     --ink          #5C4D51   warm dark grey-brown text
-     --paper        #FFFEFB   main content background
-     --cream        #FCFCF0   About Us card background
-     --border       #E5E0D8   soft neutral border
+   Matches the reference mockup:
+     - Montserrat everywhere (400 / 500 / 600 / 700 / 800)
+     - Light pink header bar, logo far left, nav far right
+     - White hero, LEFT-aligned: big pink title (2 lines),
+       subtitle, search bar (thin dark border + round pink btn)
+     - Cream About Us box on the grey canvas below
    ============================================================ */
-
-@font-face {
-    font-family: 'ScopeOne-Regular';
-    src: url('assets/fonts/ScopeOne-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'LexendExa';
-    src: url('assets/fonts/LexendExa-VariableFont_wght.ttf') format('truetype');
-}
 
 :root {
     --header-pink: #F8B4B4;
-    --header-pink-dark: #E89C9C;
-    --ink: #5C4D51;
+    --title-pink: #E08888;        /* title + section heading pink */
+    --ink: #5C4D51;               /* dark brown-grey body text */
     --ink-soft: #8A7D81;
-    --paper: #FFFEFB;
-    --cream: #FCFCF0;
+    --paper: #FFFEFB;             /* white content section */
+    --cream: #FCFCF0;             /* About Us card */
+    --canvas: #F2F0EE;            /* light grey page background */
+    --dark-border: #4A3E3D;       /* thin dark border on the search bar */
     --border: #E5E0D8;
     --white: #FFFFFF;
     --shadow-soft: 0 4px 14px rgba(92, 77, 81, 0.06);
@@ -41,9 +30,9 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #F2F0EE; /* light grey canvas behind everything */
+    background-color: var(--canvas);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -59,7 +48,7 @@ body {
 .nav-inner {
     max-width: 72rem;
     margin: 0 auto;
-    padding: 0.85rem 1.5rem;
+    padding: 0.85rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -68,11 +57,6 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-family: sans-serif;
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--ink);
 }
 
 .logo a {
@@ -81,74 +65,73 @@ body {
 }
 
 .logopic {
-    max-height: 2.6rem;
+    max-height: 2.75rem;
     width: auto;
     display: block;
     border-radius: 50%;
     background-color: var(--white);
 }
 
-/* Header navigation links */
+/* Header navigation — far right, medium weight */
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.75rem;
+    gap: 2.25rem;
 }
 
 .nav-links a {
     text-decoration: none;
     color: var(--ink);
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
     font-weight: 500;
     padding: 0.3rem 0.1rem;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s ease, border-color 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
     color: var(--white);
-    border-bottom-color: var(--white);
 }
 
-/* ============ Home hero (white section) ============ */
+/* ============ Home hero (white, LEFT-aligned) ============ */
 
 .home-main {
-    flex: 1;
     background-color: var(--paper);
-    padding: 4.5rem 1.5rem 5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 4rem 1.5rem 3rem;
 }
 
 .home-inner {
     width: 100%;
-    max-width: 60rem;
+    max-width: 54rem;
     margin: 0 auto;
+    text-align: left;
 }
 
+/* Big pink title, two lines */
 .home-title {
-    font-family: LexendExa, sans-serif;
-    font-weight: 700;
-    font-size: 2.75rem;
-    line-height: 1.15;
-    color: var(--header-pink-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 2.6rem;
+    line-height: 1.18;
+    color: var(--title-pink);
     margin: 0;
-    max-width: 22ch;
 }
 
+/* Subtitle: smaller, darker brown-grey, regular */
 .home-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
     font-size: 1.15rem;
-    color: var(--ink-soft);
-    margin: 0.9rem 0 0 0;
+    color: #6E5F63;
+    margin: 0.7rem 0 0 0;
 }
 
 /* Search bar row */
 .searcharea {
-    margin-top: 2.75rem;
+    margin-top: 2.5rem;
     width: 100%;
-    max-width: 42rem;
+    max-width: 36rem;
 }
 
 .searchbar-row {
@@ -158,44 +141,51 @@ body {
     width: 100%;
 }
 
+/* Column picker (left of input) — small pill, same border */
 .searchcolumn {
     flex-shrink: 0;
-    padding: 0.8rem 1rem;
-    border: 1.5px solid var(--ink);
+    padding: 0.72rem 1rem;
+    border: 1px solid var(--dark-border);
     border-radius: 9999px;
-    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
     color: var(--ink);
     background-color: var(--white);
     outline: none;
     cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease;
 }
 
 .searchcolumn:focus {
-    box-shadow: 0 0 0 3px rgba(248, 180, 180, 0.35);
+    box-shadow: 0 0 0 3px rgba(224, 136, 136, 0.25);
 }
 
+/* Elongated input, thin dark border */
 .searchbarbar {
     flex: 1;
     min-width: 0;
     padding: 0.8rem 1.4rem;
-    border: 1.5px solid var(--ink);
+    border: 1px solid var(--dark-border);
     border-radius: 9999px;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
+    font-weight: 400;
     color: var(--ink);
     background-color: var(--white);
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease;
 }
 
 .searchbarbar::placeholder {
-    color: #B9AEB1;
+    color: #A79DA0;
 }
 
 .searchbarbar:focus {
-    box-shadow: 0 0 0 3px rgba(248, 180, 180, 0.35);
+    box-shadow: 0 0 0 3px rgba(224, 136, 136, 0.25);
 }
 
+/* Circular pink search button, immediately right of the input */
 #search-button {
     flex-shrink: 0;
     background-color: var(--header-pink);
@@ -211,53 +201,49 @@ body {
 
 #search-button:hover {
     transform: translateY(-2px);
-    background-color: var(--header-pink-dark);
-    box-shadow: 0 6px 16px rgba(232, 156, 156, 0.45);
+    background-color: var(--title-pink);
+    box-shadow: 0 6px 16px rgba(224, 136, 136, 0.45);
 }
 
 .searchbutton {
-    height: 1.15rem;
+    height: 1.2rem;
     width: auto;
-    filter: brightness(0.35); /* make the icon read as ink on pink */
+    filter: brightness(0.4);
 }
 
-.search-hint {
-    margin: 0.9rem 0 0 0;
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-}
-
-/* ============ About Us (cream card) ============ */
+/* ============ About Us (cream box on the grey canvas) ============ */
 
 .about-section {
-    background-color: var(--paper);
-    padding: 0 1.5rem 4.5rem;
+    background-color: var(--canvas);
+    padding: 2.75rem 1.5rem 4.5rem;
 }
 
 .about-inner {
     width: 100%;
-    max-width: 60rem;
+    max-width: 54rem;
     margin: 0 auto;
 }
 
 .about-card {
     background-color: var(--cream);
-    border-radius: 1.25rem;
-    padding: 2.5rem 3rem;
-    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 2.75rem 3rem;
+    border: 1px solid #EAE4DC;
 }
 
 .about-card h2 {
-    font-family: LexendExa, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--header-pink-dark);
-    margin: 0 0 1rem 0;
+    font-size: 1.6rem;
+    color: var(--title-pink);
+    margin: 0 0 1.1rem 0;
 }
 
 .about-card p {
-    font-size: 1rem;
-    line-height: 1.7;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 1.02rem;
+    line-height: 1.75;
     color: var(--ink);
     margin: 0;
 }
@@ -266,20 +252,23 @@ body {
 
 .bodynorm {
     min-height: 100vh;
-    background-color: #F2F0EE;
+    background-color: var(--canvas);
 }
 
 .bodynorm .home-main {
     padding-top: 2.5rem;
+    padding-bottom: 2rem;
 }
 
 .results-status {
-    font-size: 1.05rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.02rem;
     font-weight: 600;
     color: var(--ink);
     margin: 2rem auto 1.25rem;
     text-align: center;
     max-width: 68rem;
+    padding: 0 1.5rem;
 }
 
 .results-area {
@@ -325,7 +314,8 @@ body {
 .result-id {
     align-self: flex-start;
     background-color: #FBEAEA;
-    color: var(--header-pink-dark);
+    color: var(--title-pink);
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -338,6 +328,7 @@ body {
     align-self: flex-start;
     background-color: #EEF1EC;
     color: #5F7260;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.72rem;
     font-weight: 700;
     padding: 0.25rem 0.7rem;
@@ -347,6 +338,7 @@ body {
 }
 
 .result-claim {
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--ink);
@@ -354,7 +346,9 @@ body {
 }
 
 .result-meta {
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.9rem;
+    font-weight: 400;
     color: var(--ink-soft);
 }
 
@@ -372,6 +366,7 @@ body {
     background-color: #F9F5F3;
     border: 1px solid #F0D9D9;
     color: var(--ink-soft);
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
     padding: 0.25rem 0.6rem;
@@ -379,6 +374,7 @@ body {
 }
 
 .study-mini-empty {
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
     color: #B9AEB1;
 }
@@ -386,7 +382,7 @@ body {
 /* Highlighted search match */
 .match-highlight {
     background-color: #FDE1E1;
-    color: var(--header-pink-dark);
+    color: var(--title-pink);
     border-radius: 4px;
     padding: 0 0.15rem;
     font-weight: 700;
@@ -398,7 +394,7 @@ body {
     justify-content: center;
     gap: 1rem;
     margin: 2rem auto 0;
-    padding: 0 1.5rem;
+    padding: 0 1.5rem 3rem;
     max-width: 68rem;
 }
 
@@ -411,6 +407,7 @@ body {
     display: inline-block;
     padding: 0.8rem 2.2rem;
     border-radius: 9999px;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -431,13 +428,13 @@ body {
 .refresh-btn {
     background-color: var(--white);
     color: var(--ink);
-    border: 1.5px solid var(--border);
+    border: 1px solid var(--dark-border);
 }
 
 .refresh-btn:hover {
     transform: translateY(-2px);
-    border-color: var(--header-pink);
-    box-shadow: 0 6px 16px rgba(248, 180, 180, 0.3);
+    border-color: var(--title-pink);
+    box-shadow: 0 6px 16px rgba(224, 136, 136, 0.3);
 }
 
 .load-more[hidden],
@@ -446,14 +443,14 @@ body {
 }
 
 /* Error messages (server errors injected into the page body). The
-   search status line is also a direct <p> child of body, so exclude it
-   from this card treatment. */
+   search status line is also a direct <p> child of body, so exclude it. */
 .bodynorm > p:not(.results-status) {
     background-color: var(--white);
     padding: 2rem;
     border-radius: 1.1rem;
     border: 1px solid var(--border);
-    font-size: 1.05rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.02rem;
     font-weight: 500;
     max-width: 35rem;
     text-align: center;
@@ -468,13 +465,15 @@ body {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
+    padding: 2rem 1.5rem 0;
 }
 
 #claim {
-    font-size: 2.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.2rem;
     font-weight: 800;
     color: var(--ink);
-    margin: 2rem 0;
+    margin: 1.5rem 0 2rem 0;
 }
 
 .EvIntReport h3 {
@@ -484,7 +483,9 @@ body {
     border-radius: 1.1rem 1.1rem 0 0;
     border: 1px solid var(--border);
     border-bottom: none;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--ink-soft);
@@ -498,7 +499,8 @@ body {
     border: 1px solid var(--border);
     border-top: none;
     box-shadow: var(--shadow-soft);
-    font-size: 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--ink);
 }
@@ -507,10 +509,13 @@ body {
     width: 100%;
     max-width: 44rem;
     margin: 0 auto 2rem;
+    padding: 0 1.5rem;
 }
 
 .EvIntReport + div h2 {
-    font-size: 1.4rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
     color: var(--ink);
     margin-bottom: 1.4rem;
 }
@@ -538,13 +543,17 @@ body {
 .studyID {
     margin: 0 0 0.4rem 0;
     color: var(--ink);
-    font-size: 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
 }
 
 .study-score {
     margin: 0;
     color: var(--ink-soft);
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
+    font-weight: 400;
 }
 
 /* ============ Mobile ============ */
@@ -555,11 +564,15 @@ body {
     }
 
     .home-main {
-        padding: 3rem 1.25rem 3.5rem;
+        padding: 3.5rem 1.25rem 3rem;
     }
 
     .about-card {
-        padding: 1.8rem 1.5rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .about-section {
+        padding: 2.5rem 1.25rem 3.5rem;
     }
 
     .searchbar-row {
@@ -571,10 +584,14 @@ body {
     }
 
     .nav-links {
-        gap: 1rem;
+        gap: 1.25rem;
     }
 
     .nav-links a {
         font-size: 0.85rem;
+    }
+
+    .nav-inner {
+        padding: 0.7rem 1.25rem;
     }
 }
