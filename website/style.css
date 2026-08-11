@@ -1006,15 +1006,29 @@ body {
     animation-delay: 0.2s;
 }
 
-/* Main claim heading — big, bold, dark brown (~phi^2). Pink stays for
-   the top bars and small accents; the headline keeps the page grounded. */
+/* Main claim heading — big, bold, dark brown (~phi^2), with a short pink
+   underline bar as the one pink accent on the headline. */
 #claim {
+    position: relative;
     font-family: 'Montserrat', sans-serif;
     font-size: 2.6rem;
     font-weight: 800;
     line-height: 1.2;
     color: var(--ink);
     margin: 0 0 2.25rem 0;
+}
+
+/* Subtle pink underline under the claim headline — short, rounded, and
+   sized to the text (not stretched across the page). */
+#claim::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.85rem;
+    width: 5.5rem;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: var(--accent-pink);
 }
 
 /* Section subheadings (Overview / Information On Individual Studies) */
