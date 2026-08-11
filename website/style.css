@@ -756,7 +756,7 @@ body {
 
 .load-more {
     background-color: var(--accent-pink);
-    color: var(--ink);
+    color: var(--white);
     border: none;
 }
 
