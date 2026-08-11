@@ -1174,6 +1174,168 @@ body {
     margin: 0;
 }
 
+/* ============ Contact page ============ */
+
+.contact-main {
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+}
+
+/* Brown headline with the same subtle pink underline as the report page */
+.contact-title {
+    position: relative;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.6rem; /* ~phi^2 */
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 0 0 1rem 0;
+}
+
+.contact-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.85rem;
+    width: 5.5rem;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: var(--accent-pink);
+}
+
+.contact-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 1.4rem 0 2rem 0;
+}
+
+/* White card + pink top accent — same visual language as result cards */
+.contact-form-card {
+    background-color: var(--white);
+    border: 1px solid var(--border-pink);
+    border-top: 4px solid var(--accent-pink);
+    border-radius: 1.1rem;
+    padding: 2rem 2.25rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.form-row {
+    margin-bottom: 1.4rem;
+}
+
+.form-row label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem; /* small */
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.45rem;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem; /* body */
+    font-weight: 400;
+    color: var(--ink);
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 0.7rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-row textarea {
+    resize: vertical;
+    min-height: 9rem;
+    line-height: 1.55;
+}
+
+.form-row input::placeholder,
+.form-row textarea::placeholder {
+    color: #B3A5A8;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 0 3px rgba(235, 148, 148, 0.18);
+}
+
+/* Honeypot field is hidden from humans, visible only to bots */
+.form-honeypot {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.contact-submit {
+    display: inline-block;
+    padding: 0.8rem 2.4rem;
+    border-radius: 9999px;
+    background-color: var(--accent-pink);
+    color: var(--ink);
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem; /* body */
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.contact-submit:hover {
+    transform: translateY(-2px);
+    background-color: var(--title-pink);
+    box-shadow: 0 6px 16px rgba(235, 148, 148, 0.5);
+}
+
+.contact-submit:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.contact-submit:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
+}
+
+.contact-submit:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+}
+
+/* Success / error bar under the form */
+.form-status {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 1rem 1.25rem;
+    border-radius: 0.8rem;
+    margin: 0 0 1.25rem 0;
+}
+
+.form-status.is-success {
+    background-color: #EAF4EE;
+    color: #3E7A55;
+    border: 1px solid #CBE3D4;
+}
+
+.form-status.is-error {
+    background-color: var(--pink-fill-soft);
+    color: var(--pink-ink);
+    border: 1px solid var(--border-pink);
+}
+
 /* ============ Footer ============ */
 
 .site-footer {
@@ -1421,5 +1583,17 @@ body.page-enter-done {
 
     .report-main {
         padding: 2.25rem 1.1rem 3rem;
+    }
+
+    .contact-main {
+        padding: 2.25rem 1.1rem 3rem;
+    }
+
+    .contact-title {
+        font-size: 1.9rem;
+    }
+
+    .contact-form-card {
+        padding: 1.5rem 1.25rem;
     }
 }

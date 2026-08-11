@@ -5,3 +5,4 @@ numpy>=2,<3
 pandas>=3,<4
 gspread>=5,<7
 google-auth>=2,<4
+resend>=2,<4

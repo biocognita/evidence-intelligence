@@ -3,8 +3,22 @@ from flask_cors import CORS
 import gc
 import json
 import os
+import re
 import threading
 import time
+
+CONTACT_EMAIL = "biocognita@gmail.com"
+# Loose per-IP throttle so the free-tier email quota can't be drained by
+# one visitor spamming the form.
+_CONTACT_RATE_LIMIT = 10
+_CONTACT_WINDOW_SECONDS = 3600
+_contact_attempts = {}  # ip -> [timestamps]
+_contact_lock = threading.Lock()
+
+CONTACT_TOPICS = [
+    "General question", "Claim correction", "Study suggestion", "Feedback", "Other",
+]
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
 
 from data_loader import load_database
 from claim_loader import load_claim_database
@@ -118,6 +132,11 @@ def home():
 @app.route("/reportpage.html")
 def report_page():
     return send_from_directory(WEBSITE_DIR, "reportpage.html")
+
+
+@app.route("/contactpage.html")
+def contact_page():
+    return send_from_directory(WEBSITE_DIR, "contactpage.html")
 
 
 def _clamp_int(value, default, minimum, maximum):
@@ -251,6 +270,84 @@ def search_claims():
         "has_more": (offset + len(results)) < total,
         "results": results
     })
+
+
+@app.route("/contact", methods=["POST"])
+def contact_form():
+    """Receive the contact-page form and email it to CONTACT_EMAIL.
+
+    Sends via Resend (RESEND_API_KEY env var). If the key isn't set the
+    request still succeeds from the visitor's point of view, and the
+    message is logged so nothing is silently lost.
+    """
+    data = request.get_json(silent=True) or {}
+    # Newlines in name/topic would break the email subject — flatten them.
+    name = str(data.get("name") or "").replace("\r", " ").replace("\n", " ").strip()
+    email = str(data.get("email") or "").strip()
+    topic = str(data.get("topic") or "General question").strip()
+    message = str(data.get("message") or "").strip()
+    website = str(data.get("website") or "").strip()
+
+    # Honeypot: bots fill the hidden "website" field — drop silently.
+    if website:
+        return jsonify({"ok": True})
+
+    if not name or not email or not message:
+        return jsonify({"error": "Please fill in your name, email and message."}), 400
+    if not _EMAIL_RE.match(email):
+        return jsonify({"error": "Please enter a valid email address."}), 400
+    if len(message) > 5000 or len(name) > 100 or len(email) > 200:
+        return jsonify({"error": "Message is too long."}), 400
+    # Only ever echo back a known topic, never an arbitrary client string.
+    if topic not in CONTACT_TOPICS:
+        topic = "General question"
+
+    # Per-IP rate limit (best-effort, in-memory). Checked before sending so
+    # a spammer can't drain the free-tier quota; timestamps are only added
+    # once a send actually succeeds (see below).
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
+    now = time.time()
+    with _contact_lock:
+        recent = [t for t in _contact_attempts.get(ip, []) if now - t < _CONTACT_WINDOW_SECONDS]
+        if len(recent) >= _CONTACT_RATE_LIMIT:
+            return jsonify({"error": "Too many messages — please try again later."}), 429
+        _contact_attempts[ip] = recent
+
+    api_key = os.environ.get("RESEND_API_KEY")
+    if api_key:
+        try:
+            import resend
+            resend.api_key = api_key
+            resend.Emails.send({
+                "from": "Evidence Intelligence <onboarding@resend.dev>",
+                "to": [CONTACT_EMAIL],
+                "reply_to": email,
+                "subject": f"[Evidence Intelligence] {topic} — from {name}",
+                "text": f"Name: {name}\nEmail: {email}\nTopic: {topic}\n\n{message}",
+            })
+        except Exception:
+            app.logger.exception("Failed to send contact email via Resend")
+            return jsonify({"error": "Couldn't send your message — please try again later."}), 502
+        # Only count a send once it succeeded, so a transient Resend failure
+        # doesn't burn the visitor's quota.
+        with _contact_lock:
+            recent = _contact_attempts.get(ip, [])
+            recent.append(now)
+            _contact_attempts[ip] = recent
+        # Prune IPs with no recent attempts so the dict can't grow forever
+        # on the 512 MB tier.
+        with _contact_lock:
+            for stale_ip in [k for k, v in _contact_attempts.items() if not v]:
+                del _contact_attempts[stale_ip]
+    else:
+        # No key configured: keep the visitor's success experience and
+        # log the message so it's recoverable.
+        app.logger.warning(
+            "RESEND_API_KEY not set — contact form dropped. %s <%s> topic=%s: %s",
+            name, email, topic, message[:200]
+        )
+
+    return jsonify({"ok": True})
 
 
 @app.route("/claim/<claim_id>")
