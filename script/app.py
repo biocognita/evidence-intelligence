@@ -3,6 +3,7 @@ from flask_cors import CORS
 import gc
 import json
 import os
+import threading
 import time
 
 from data_loader import load_database
@@ -18,47 +19,6 @@ CORS(app)
 
 CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", 300))  # refresh sheet data every 5 minutes
 
-_cache = {
-    "study_data": None,
-    "claim_data": None,
-    "claims_by_id": None,
-    "study_by_claim": None,
-    "loaded_at": 0
-}
-
-
-def get_data():
-    """Refresh the cached data + indexes from Google Sheets if the cache is
-    missing or older than CACHE_TTL_SECONDS. Returns the cache dict."""
-
-    now = time.time()
-    is_stale = (now - _cache["loaded_at"]) > CACHE_TTL_SECONDS
-
-    if _cache["study_data"] is None or is_stale:
-        study_data = load_database()
-        claim_data = load_claim_database()
-
-        _cache["study_data"] = study_data
-        _cache["claim_data"] = claim_data
-        _cache["claims_by_id"] = build_claims_index(claim_data)
-        # One indexed copy of the study data (instead of per-group copies) so
-        # memory stays ~1x even with millions of studies.
-        _cache["study_by_claim"] = study_data.set_index("Claim ID", drop=False)
-        _cache["loaded_at"] = now
-
-    return _cache
-
-
-@app.route("/")
-def home():
-    return send_from_directory(WEBSITE_DIR, "index.html")
-
-
-@app.route("/reportpage.html")
-def report_page():
-    return send_from_directory(WEBSITE_DIR, "reportpage.html")
-
-
 # Columns users may search via ?col=. Kept explicit so the front-end
 # always matches what the backend will accept.
 SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"]
@@ -72,6 +32,92 @@ ALL_FIELDS_COLUMNS = ["Claim ID"] + SEARCHABLE_COLUMNS
 # serialized in one response.
 SEARCH_DEFAULT_LIMIT = 20
 SEARCH_MAX_LIMIT = 100
+
+# Upper bound on the per-claim memo caches. Scores only change when the
+# sheet refreshes, so memoizing them makes repeat lookups dict hits — but
+# a crawler hitting thousands of distinct claim IDs must not grow memory
+# unboundedly within a 5-minute generation, so the caches are capped and
+# reset on every refresh anyway.
+MAX_MEMOIZED_CLAIMS = 1000
+
+_cache = {
+    "study_data": None,
+    "claim_data": None,
+    "claims_by_id": None,
+    "study_by_claim": None,
+    # claim column -> string-dtype Series, pre-cast ONCE at refresh time.
+    # .str.contains() needs string dtype (the cached frames are stored as
+    # memory-shrinking category), and astype() per request is pure Python
+    # — the single biggest CPU waste on Render's 0.1 core.
+    "search_columns": None,
+    # claim ID -> {confidence_score, evidence_strength, study_breakdown}
+    "claim_enrichment": None,
+    # claim ID -> full report dict (built once per cache generation)
+    "claim_reports": None,
+    "loaded_at": 0,
+}
+
+# Guards get_data() so two gunicorn threads can't both download the sheet
+# on the same expiry (double Google rate-limit usage + double CPU cost).
+_refresh_lock = threading.Lock()
+
+
+def get_data():
+    """Return the cache, refreshing from Google Sheets only when it is
+    missing or older than CACHE_TTL_SECONDS. Double-checked locking keeps
+    concurrent requests from triggering duplicate refreshes."""
+    now = time.time()
+    is_fresh = (
+        _cache["claim_data"] is not None
+        and (now - _cache["loaded_at"]) <= CACHE_TTL_SECONDS
+    )
+    if is_fresh:
+        return _cache
+
+    with _refresh_lock:
+        # Another thread may have refreshed while we waited for the lock.
+        now = time.time()
+        if (
+            _cache["claim_data"] is not None
+            and (now - _cache["loaded_at"]) <= CACHE_TTL_SECONDS
+        ):
+            return _cache
+
+        study_data = load_database()
+        claim_data = load_claim_database()
+
+        _cache["study_data"] = study_data
+        _cache["claim_data"] = claim_data
+        _cache["claims_by_id"] = build_claims_index(claim_data)
+        # One indexed copy of the study data (instead of per-group copies) so
+        # memory stays ~1x even with millions of studies.
+        _cache["study_by_claim"] = study_data.set_index("Claim ID", drop=False)
+        # Pre-cast the searchable columns to string dtype once here instead
+        # of on every request. This duplicates the claims table's text as
+        # uncompressed strings (RAM cost ~= one extra claims-table copy —
+        # negligible at the current scale, and it removes the per-request
+        # astype() that dominated CPU on the 0.1 core).
+        _cache["search_columns"] = {
+            col: claim_data[col].astype("string")
+            for col in ALL_FIELDS_COLUMNS
+        }
+        # Fresh memo caches per generation — scores are deterministic until
+        # the sheet data changes, so never recompute them per request.
+        _cache["claim_enrichment"] = {}
+        _cache["claim_reports"] = {}
+        _cache["loaded_at"] = time.time()
+
+    return _cache
+
+
+@app.route("/")
+def home():
+    return send_from_directory(WEBSITE_DIR, "index.html")
+
+
+@app.route("/reportpage.html")
+def report_page():
+    return send_from_directory(WEBSITE_DIR, "reportpage.html")
 
 
 def _clamp_int(value, default, minimum, maximum):
@@ -93,9 +139,10 @@ def search_claims():
       /search?q=melatonin&limit=10&offset=20    -> paginate the results
 
     Only the matched page is serialized to JSON. Each result is enriched
-    with its confidence score, evidence strength and per-study breakdown
-    (computed from the cached study data), and per-request temporaries are
-    released before the response goes out.
+    with its confidence score, evidence strength and per-study breakdown —
+    served from the per-claim memo cache after the first hit, so repeat
+    searches (and search-as-you-type) are pure dict lookups, not re-scoring
+    every study on Render's 0.1 core.
     """
 
     query = (request.args.get("q") or "").strip()
@@ -126,28 +173,27 @@ def search_claims():
         }), 503
 
     claims = data["claim_data"]
+    search_columns = data["search_columns"]  # pre-cast string Series
 
     # Lazy filtering: only rows containing the query (case-insensitive) are
-    # materialized. astype("string") keeps this working even if the
-    # searched column is a low-cardinality column (compressed to category
-    # dtype), and regex=False treats the query as literal text (a query
+    # materialized. The columns are already string dtype (cast once at
+    # refresh), and regex=False treats the query as literal text (a query
     # like "C+" must not be interpreted as a regular expression).
     if search_column == "All fields":
         # OR together matches from every searchable text column.
-        masks = [
-            claims[col].astype("string").str.contains(query, case=False, na=False, regex=False)
-            for col in ALL_FIELDS_COLUMNS
-        ]
-        mask = masks[0]
-        for other in masks[1:]:
-            mask = mask | other
+        mask = search_columns[ALL_FIELDS_COLUMNS[0]].str.contains(
+            query, case=False, na=False, regex=False
+        )
+        for col in ALL_FIELDS_COLUMNS[1:]:
+            mask = mask | search_columns[col].str.contains(
+                query, case=False, na=False, regex=False
+            )
         matched = claims[mask]
-        del masks
     else:
         matched = claims[
-            claims[search_column]
-            .astype("string")
-            .str.contains(query, case=False, na=False, regex=False)
+            search_columns[search_column].str.contains(
+                query, case=False, na=False, regex=False
+            )
         ]
 
     total = len(matched)
@@ -160,11 +206,15 @@ def search_claims():
     # `NaN` literal that to_dict() would leave in the payload).
     results = json.loads(page.to_json(orient="records"))
 
-    # Enrich each result with its confidence score + strength + per-study
-    # breakdown using the cached study index (no extra Google Sheets
-    # calls). Skip claims with no studies rather than failing the search.
+    # Enrich each result from the memo cache, computing on first encounter
+    # only. Skip claims with no studies rather than failing the search.
+    enrichment = data["claim_enrichment"]
     for record in results:
         claim_id = record.get("Claim ID")
+        cached = enrichment.get(claim_id)
+        if cached is not None:
+            record.update(cached)
+            continue
         try:
             # .loc[[claim_id]] (double brackets) always yields a DataFrame,
             # even for claims with exactly one study (.loc[claim_id] would
@@ -176,13 +226,19 @@ def search_claims():
             score, strength, study_scores = evaluate_claim(record, studies)
         except Exception:
             continue
-        record["confidence_score"] = round(score, 2)
-        record["evidence_strength"] = strength
-        record["study_breakdown"] = build_study_breakdown(studies, study_scores)
-        del studies, study_scores
+        cached = {
+            "confidence_score": round(score, 2),
+            "evidence_strength": strength,
+            "study_breakdown": build_study_breakdown(studies, study_scores),
+        }
+        enrichment[claim_id] = cached
+        record.update(cached)
+
+    if len(enrichment) > MAX_MEMOIZED_CLAIMS:
+        enrichment.clear()
 
     # Aggressive memory reclaim on the 512 MB Render free tier.
-    del matched, page, claims, data
+    del matched, page, claims, search_columns
     gc.collect()
 
     return jsonify({
@@ -219,29 +275,39 @@ def get_claim_report(claim_id):
     if claim is None:
         return jsonify({"error": f"Claim {claim_id} not found"}), 404
 
-    try:
-        # .loc[[claim_id]] (double brackets) always yields a DataFrame,
-        # even for claims with exactly one study (.loc[claim_id] would
-        # return a bare Series and break vectorized scoring).
-        studies = data["study_by_claim"].loc[[claim_id]]
-    except KeyError:
-        studies = data["study_data"].iloc[0:0]
+    # Serve the fully-built report from the memo cache when available —
+    # the report only depends on cached data, so it is identical (and
+    # expensive to rebuild) within a cache generation.
+    report = data["claim_reports"].get(claim_id)
 
-    confidence_score, confidence, study_scores = evaluate_claim(claim, studies)
+    if report is None:
+        try:
+            # .loc[[claim_id]] (double brackets) always yields a DataFrame,
+            # even for claims with exactly one study (.loc[claim_id] would
+            # return a bare Series and break vectorized scoring).
+            studies = data["study_by_claim"].loc[[claim_id]]
+        except KeyError:
+            studies = data["study_data"].iloc[0:0]
 
-    report = generate_claim_report(
-        claim,
-        studies,
-        round(confidence_score, 2),
-        confidence,
-        study_scores
-    )
+        confidence_score, confidence, study_scores = evaluate_claim(claim, studies)
 
-    # Aggressive memory reclaim on the 512 MB Render free tier: drop the
-    # per-request temporaries now that the JSON payload is built, and ask
-    # the garbage collector to release any cyclic garbage immediately.
-    del studies, study_scores, claim
-    gc.collect()
+        report = generate_claim_report(
+            claim,
+            studies,
+            round(confidence_score, 2),
+            confidence,
+            study_scores
+        )
+        data["claim_reports"][claim_id] = report
+
+        if len(data["claim_reports"]) > MAX_MEMOIZED_CLAIMS:
+            data["claim_reports"].clear()
+
+        # Aggressive memory reclaim on the 512 MB Render free tier: drop the
+        # per-request temporaries now that the JSON payload is built, and ask
+        # the garbage collector to release any cyclic garbage immediately.
+        del studies, study_scores, claim, confidence_score, confidence
+        gc.collect()
 
     return jsonify(report)
 

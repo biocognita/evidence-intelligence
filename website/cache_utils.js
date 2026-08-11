@@ -11,6 +11,12 @@
 
 const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
 
+// Query once at load (not per transition) — cheap, and identical for the
+// life of the page.
+const prefersReducedMotion =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // ----- localStorage cache helpers (best-effort) -----
 
 function cacheKey(prefix, ...parts) {
@@ -98,9 +104,7 @@ function dismissMatchHighlights() {
     if (!marks.length) {
         return;
     }
-    const reduceMotion = window.matchMedia &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
+    if (prefersReducedMotion) {
         unwrapHighlightMarks();
         return;
     }
@@ -108,15 +112,9 @@ function dismissMatchHighlights() {
     setTimeout(unwrapHighlightMarks, 450);
 }
 
-// Call once per page: dismiss on first click, first scroll, or after 8
-// seconds so highlights never linger.
-function initMatchHighlightDismissal() {
-    document.addEventListener("click", dismissMatchHighlights, { once: true });
-    document.addEventListener("scroll", dismissMatchHighlights, { once: true, passive: true });
-    matchHighlightTimer = setTimeout(dismissMatchHighlights, 8000);
-}
-
-// Re-arm the one-shot dismissal (used after re-highlighting via the chip).
+// The one-shot dismissal wiring shared by initMatchHighlightDismissal()
+// (first call on the page) and armHighlightDismissal() (re-arms after a
+// query-chip re-highlight).
 function armHighlightDismissal() {
     document.addEventListener("click", dismissMatchHighlights, { once: true });
     document.addEventListener("scroll", dismissMatchHighlights, { once: true, passive: true });
@@ -124,6 +122,12 @@ function armHighlightDismissal() {
         clearTimeout(matchHighlightTimer);
     }
     matchHighlightTimer = setTimeout(dismissMatchHighlights, 8000);
+}
+
+// Call once per page: dismiss on first click, first scroll, or after 8
+// seconds so highlights never linger.
+function initMatchHighlightDismissal() {
+    armHighlightDismissal();
 }
 
 // After rendering new content (e.g. "Load more" cards), strip highlights
@@ -135,6 +139,82 @@ function purgeDismissedHighlights() {
     }
     unwrapHighlightMarks();
 }
+
+// ----- Page transitions -----
+
+// Cross-page fades: clicking an internal link fades the current page
+// out, then navigates; the destination page fades itself in on load.
+// Reduced-motion users get plain instant navigation instead.
+
+let pageTransitionRunning = false;
+
+// Fade the current page out, then navigate. Falls back to an instant
+// jump if reduced-motion is on or a transition is already running.
+function transitionTo(url) {
+    if (prefersReducedMotion || pageTransitionRunning) {
+        window.location.href = url;
+        return;
+    }
+    pageTransitionRunning = true;
+    document.body.classList.add("page-leaving");
+    window.setTimeout(() => {
+        window.location.href = url;
+    }, 230);
+}
+
+function initPageTransitions() {
+    if (prefersReducedMotion) {
+        return;
+    }
+
+    // Fade the just-loaded page in. Also covers back/forward navigation
+    // (the class is added every load, before the first paint).
+    const body = document.body;
+    if (body && !body.classList.contains("page-enter-done")) {
+        body.classList.add("page-entering");
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => body.classList.add("page-enter-done"));
+        });
+    }
+
+    // Intercept internal link clicks so navigation cross-fades. Anchor
+    // (#section), mailto, external, and target=_blank links are left alone.
+    document.addEventListener("click", (event) => {
+        const link = event.target.closest ? event.target.closest("a") : null;
+        if (!link) {
+            return;
+        }
+        // Never hijack modified clicks (ctrl/cmd/shift/open-in-new-tab)
+        // or middle-button clicks — let the browser do its normal thing.
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+        const href = link.getAttribute("href") || "";
+        if (!href || href.charAt(0) === "#" || /^(mailto:|tel:|javascript:)/i.test(href)) {
+            return;
+        }
+        if (link.target && link.target !== "_self") {
+            return;
+        }
+        if (link.hasAttribute("download")) {
+            return;
+        }
+        let url;
+        try {
+            url = new URL(link.href, window.location.href);
+        } catch (err) {
+            return;
+        }
+        if (url.origin !== window.location.origin) {
+            return;
+        }
+        event.preventDefault();
+        transitionTo(url.href);
+    }, true);
+}
+
+// Auto-run: every page that loads cache_utils.js gets cross-page fades.
+initPageTransitions();
 
 // ----- Scroll reveal -----
 
