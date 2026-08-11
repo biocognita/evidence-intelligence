@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=21" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=22" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -117,6 +117,10 @@
             <div id="breakdown" hidden></div>
         </main>
 
+        <footer class="site-footer reveal">
+            <p>Evidence Intelligence Project · © 2026 Biocognita</p>
+        </footer>
+
         <script src="api_config.js"></script>
         <script src="cache_utils.js"></script>
         <script>
@@ -221,7 +225,7 @@
                     });
                 } else {
                     const none = document.createElement("p");
-                    none.className = "report-empty";
+                    none.className = "report-empty report-reveal";
                     none.textContent = "No study breakdown available.";
                     breakdownContainer.appendChild(none);
                 }

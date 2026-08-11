@@ -7,7 +7,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=21" rel="stylesheet" type="text/css"/>
+        <link href="style.css?v=22" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -63,12 +63,88 @@
             </div>
         </div>
 
-        <div id="results" class="results-area"></div>
+        <div class="results-wrap">
+            <!-- Shimmer skeleton: mirrors the result-card grid while the
+                 first search is in flight, then cross-fades out. -->
+            <div id="results-skeleton" class="results-skeleton" aria-hidden="true" hidden>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+                <div class="sk-result">
+                    <div class="sk sk-pill"></div>
+                    <div class="sk sk-claim-line"></div>
+                    <div class="sk sk-claim-line short"></div>
+                    <div class="sk sk-meta-line"></div>
+                    <div class="sk-mini-row">
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                        <div class="sk sk-mini"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="results" class="results-area"></div>
+        </div>
 
-        <div class="results-actions">
+        <div class="results-actions" id="results-actions" hidden>
             <button id="refresh" class="refresh-btn" type="button" hidden>↻ Refresh results</button>
             <button id="load-more" class="load-more" type="button" hidden>Load more results</button>
         </div>
+
+        <footer class="site-footer reveal">
+            <p>Evidence Intelligence Project · © 2026 Biocognita</p>
+        </footer>
 
         <script src="api_config.js"></script>
         <script src="scripts.js"></script>
@@ -104,11 +180,29 @@
                     el.classList.toggle("is-bar", bar);
                 }
 
+                // Skeleton grid shown while the first search is in flight
+                const skeletonEl = document.getElementById("results-skeleton");
+                function showSearchSkeleton() {
+                    // No-op once the skeleton has been removed from the DOM
+                    // (e.g. a "Load more" fetch after the first render).
+                    if (skeletonEl.isConnected) {
+                        skeletonEl.hidden = false;
+                    }
+                }
+                function dismissSearchSkeleton() {
+                    if (skeletonEl.hidden || !skeletonEl.isConnected) return;
+                    skeletonEl.classList.add("sk-leaving");
+                    const finish = () => skeletonEl.remove();
+                    skeletonEl.addEventListener("transitionend", finish, { once: true });
+                    setTimeout(finish, 600);
+                }
+
                 // Fill the cute results header: query + count chips, and a
                 // short status line (the chips already carry the detail).
                 function showResultsHeader(count, total) {
                     const header = document.getElementById("results-header");
                     header.hidden = false;
+                    header.classList.add("report-reveal");
                     document.getElementById("chip-query").textContent =
                         `“${currentQuery}”`;
                     document.getElementById("chip-count").textContent =
@@ -130,9 +224,18 @@
                 }
 
                 function renderResults(results, total) {
+                dismissSearchSkeleton();
                 const container = document.getElementById("results");
                 const loadMoreBtn = document.getElementById("load-more");
                 const refreshBtn = document.getElementById("refresh");
+
+                // Reveal the action buttons row with the first batch of
+                // results (it stays hidden until there's something to do).
+                const actions = document.getElementById("results-actions");
+                if (actions.hidden) {
+                    actions.hidden = false;
+                    actions.classList.add("report-reveal");
+                }
 
                 const shown = currentOffset + results.length;
                 showResultsHeader(shown, total);
@@ -283,6 +386,10 @@
                     }
                 }
 
+                // Skeleton grid shown while the first search is in flight,
+                // so the page reads as "content is coming" instead of blank.
+                showSearchSkeleton();
+
                 let payload;
                 try {
                     const searchParams = new URLSearchParams({
@@ -297,14 +404,19 @@
                     }
                     const response = await fetch(`${API_BASE}/search?${searchParams.toString()}`);
                     if (!response.ok) {
-                        throw new Error(`Search failed (HTTP ${response.status})`);
+                        const err = new Error(`Search failed (HTTP ${response.status})`);
+                        err.status = response.status;
+                        throw err;
                     }
                     payload = await response.json();
                 } catch (err) {
+                    dismissSearchSkeleton();
                     document.getElementById("results-header").hidden = true;
                     setStatus(
-                        "Couldn't reach the Evidence Intelligence server. " +
-                        "Make sure the server is running.",
+                        err && err.status === 503
+                            ? "Database temporarily unavailable. Please try again in a moment."
+                            : "Couldn't reach the Evidence Intelligence server. " +
+                              "Make sure the server is running.",
                         true
                     );
                     loadMoreBtn.hidden = true;
@@ -314,6 +426,7 @@
                 }
 
                 if (payload.total === 0) {
+                    dismissSearchSkeleton();
                     // The header box is the container here, so the message
                     // is plain text inside it (no extra bar).
                     showResultsHeader(0, 0);

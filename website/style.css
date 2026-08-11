@@ -309,7 +309,7 @@ body {
         animation: none;
     }
 
-    #report-skeleton.sk-leaving {
+    .sk-leaving {
         transition: none;
     }
 }
@@ -435,26 +435,107 @@ body {
     margin: 0;
 }
 
-.results-area {
+/* Centering wrapper for the results grid; also anchors the loading
+   skeleton so it can overlay the incoming cards and cross-fade out. */
+.results-wrap {
+    position: relative;
     width: 100%;
     max-width: 68rem;
     margin: 0 auto;
     padding: 0 1.5rem;
+}
+
+.results-area,
+.results-skeleton {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.25rem;
 }
 
 @media (min-width: 720px) {
-    .results-area {
+    .results-area,
+    .results-skeleton {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (min-width: 1100px) {
-    .results-area {
+    .results-area,
+    .results-skeleton {
         grid-template-columns: repeat(3, 1fr);
     }
+}
+
+/* ============ Search results skeleton ============ */
+
+/* Shimmer placeholder cards that mirror the result-card layout while
+   the first search is in flight, so the page never looks broken. */
+.results-skeleton {
+    margin-bottom: 2.5rem;
+}
+
+.results-skeleton[hidden] {
+    display: none;
+}
+
+.sk-result {
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--header-pink);
+    border-radius: 1.1rem;
+    padding: 1.4rem 1.5rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.sk-result .sk-pill {
+    height: 1.35rem;
+    width: 5rem;
+    border-radius: 9999px;
+    margin-bottom: 0.7rem;
+}
+
+.sk-result .sk-claim-line {
+    height: 1.3rem;
+    width: 80%;
+    border-radius: 0.4rem;
+    margin-bottom: 0.55rem;
+}
+
+.sk-result .sk-claim-line.short {
+    width: 55%;
+}
+
+.sk-result .sk-meta-line {
+    height: 0.8rem;
+    width: 88%;
+    border-radius: 0.35rem;
+    margin-top: 0.8rem;
+}
+
+.sk-result .sk-mini-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px dashed var(--border);
+}
+
+.sk-result .sk-mini {
+    height: 0.95rem;
+    width: 4.6rem;
+    border-radius: 9999px;
+}
+
+/* Fade the search skeleton out over the arriving cards — same soft
+   cross-fade as the report page skeleton. */
+.results-skeleton.sk-leaving {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
 .result-card {
@@ -790,15 +871,18 @@ body {
 /* Gentle rise-and-fade used for the report reveal, the search cards,
    and the home hero. `backwards` fill keeps things hidden during the
    delay, then lets elements return to their natural styles afterwards
-   (so :hover transforms like the card lift still work). */
+   (so :hover transforms like the card lift still work).
+
+   Timing: one shared ease-out curve (snappy start, soft landing) with
+   a short 10px rise — noticeable but never floaty. */
 .report-reveal {
-    animation: rise-in 0.5s ease backwards;
+    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @keyframes rise-in {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
@@ -811,7 +895,7 @@ body {
 .home-title,
 .home-subtitle,
 .home-main .searcharea {
-    animation: rise-in 0.55s ease backwards;
+    animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .home-subtitle {
@@ -950,6 +1034,24 @@ body {
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
+    color: var(--ink-soft);
+    margin: 0;
+}
+
+/* ============ Footer ============ */
+
+.site-footer {
+    margin-top: auto; /* pin to the bottom on short pages */
+    padding: 2.5rem 1.5rem 3.25rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background-color: var(--white);
+}
+
+.site-footer p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem; /* small */
+    font-weight: 500;
     color: var(--ink-soft);
     margin: 0;
 }

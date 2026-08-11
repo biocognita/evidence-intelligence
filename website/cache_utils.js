@@ -136,6 +136,38 @@ function purgeDismissedHighlights() {
     unwrapHighlightMarks();
 }
 
+// ----- Scroll reveal -----
+
+// Fade .reveal elements in as they scroll into view (the About Us /
+// Methodology / Contact cards on the home page, and the footer on every
+// page). Reduced-motion users are handled in CSS, which forces .reveal
+// to stay fully visible, so this only ever adds the class.
+function initScrollReveal() {
+    const revealEls = document.querySelectorAll(".reveal");
+    if (!revealEls.length) {
+        return; // no reveal elements on this page
+    }
+    if (!("IntersectionObserver" in window)) {
+        revealEls.forEach((el) => el.classList.add("visible"));
+        return;
+    }
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.2 }
+    );
+    revealEls.forEach((el) => observer.observe(el));
+}
+
+// Auto-run: every page that loads cache_utils.js gets the scroll reveal.
+initScrollReveal();
+
 // ----- XSS-safe match highlighting -----
 
 // Splits `text` into plain text nodes and <mark> elements so the query can
