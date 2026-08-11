@@ -1505,6 +1505,10 @@ body.page-enter-done {
         font-size: 2rem;
     }
 
+    .contact-title {
+        font-size: 2rem;
+    }
+
     .home-main {
         padding: 3.5rem 1.25rem 3rem;
     }
@@ -1559,6 +1563,10 @@ body.page-enter-done {
         font-size: 1.75rem;
     }
 
+    .contact-title {
+        font-size: 1.75rem;
+    }
+
     .home-subtitle {
         font-size: 1.1rem;
     }
@@ -1602,10 +1610,6 @@ body.page-enter-done {
 
     .contact-main {
         padding: 2.25rem 1.1rem 3rem;
-    }
-
-    .contact-title {
-        font-size: 1.9rem;
     }
 
     .contact-form-card {
