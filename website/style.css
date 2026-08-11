@@ -20,7 +20,7 @@
 
 :root {
     --header-pink: #F8B4B4;
-    --accent-pink: #F0A0A0;       /* card top bars — clearly pink vs the beige borders */
+    --accent-pink: #EB9494;       /* card top bars — deeper pink so the bar reads clearly */
     --pink-fill-soft: #FDE9E9;    /* count chip */
     --pink-fill: #F6D9D9;         /* score pill */
     --pink-ink: #C06A6A;          /* deeper pink text on the pills */
@@ -740,14 +740,15 @@ body {
 }
 
 .load-more {
-    background-color: var(--header-pink);
+    background-color: var(--accent-pink);
     color: var(--ink);
     border: none;
 }
 
 .load-more:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(248, 180, 180, 0.5);
+    background-color: var(--title-pink);
+    box-shadow: 0 6px 16px rgba(235, 148, 148, 0.5);
 }
 
 .load-more:active {
@@ -763,12 +764,13 @@ body {
 .refresh-btn {
     background-color: var(--white);
     color: var(--ink);
-    border: 1px solid var(--dark-border);
+    border: 1px solid var(--accent-pink);
 }
 
 .refresh-btn:hover {
     transform: translateY(-2px);
     border-color: var(--title-pink);
+    background-color: var(--pink-fill-soft);
     box-shadow: 0 6px 16px rgba(224, 136, 136, 0.3);
 }
 
@@ -873,6 +875,7 @@ body {
        content boxes — that's what made the old skeleton look broken. */
     background-color: #F8F3EC;
     border: 1px solid #E3D9CD;
+    border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.4rem 1.5rem;
     min-width: 0;
@@ -909,6 +912,7 @@ body {
     /* Ghost tint, same as the overview cards above. */
     background-color: #F8F3EC;
     border: 1px solid #E3D9CD;
+    border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.3rem 1.5rem;
 }
@@ -1027,10 +1031,11 @@ body {
     margin-bottom: 2.5rem;
 }
 
-/* Rounded white card with a brown border — the mockup look */
+/* Rounded white card with a pink top accent — matches the results page */
 .report-card {
     background-color: var(--white);
-    border: 1px solid var(--dark-border);
+    border: 1px solid var(--border-pink);
+    border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.4rem 1.5rem;
     min-width: 0;
@@ -1084,7 +1089,8 @@ body {
 
 .study-card {
     background-color: var(--white);
-    border: 1px solid var(--dark-border);
+    border: 1px solid var(--border-pink);
+    border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.3rem 1.5rem;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -1140,7 +1146,8 @@ body {
 
 .report-empty {
     background-color: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-pink);
+    border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.5rem 2rem;
     text-align: center;
