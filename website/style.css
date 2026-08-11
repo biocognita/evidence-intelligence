@@ -28,6 +28,7 @@
     --ink: #5C4D51;               /* dark brown body text */
     --ink-soft: #9B8A8D;          /* warm taupe secondary text */
     --paper: #FFFFFF;             /* white content section */
+    --paper-pink: #FDF7F7;        /* report cards — white with a soft pink wash */
     --cream: #FCFCF0;             /* About Us card (the beige) */
     --canvas: #FFFFFF;            /* page background — white, per the mockup */
     --dark-border: #4A3E3D;       /* thin dark border on the search bar */
@@ -813,8 +814,8 @@ body {
 
 /* ============ Report page ============ */
 
-/* Page canvas stays white; the report sits on it with brown-bordered
-   white cards exactly like the mockup. */
+/* Page canvas stays white; the report sits on it with pink-tinted cards
+   and pink headings — the same pink language as the results page. */
 
 .report-main {
     width: 100%;
@@ -829,11 +830,12 @@ body {
 /* Warm-beige shimmering placeholders shown while the report loads, so
    the page never looks broken — it looks like content is on its way. */
 .sk {
+    /* Pink-tinted shimmer so the skeleton previews the pink report. */
     background: linear-gradient(
         100deg,
-        #F1EBE4 40%,
-        #FAF6F0 50%,
-        #F1EBE4 60%
+        #F5E4E4 40%,
+        #FDF3F3 50%,
+        #F5E4E4 60%
     );
     background-size: 200% 100%;
     animation: sk-shimmer 1.3s ease-in-out infinite;
@@ -871,10 +873,10 @@ body {
 }
 
 .sk-card {
-    /* Warm ghost tint: placeholder cards must never read as real white
+    /* Pink ghost tint: placeholder cards must never read as real white
        content boxes — that's what made the old skeleton look broken. */
-    background-color: #F8F3EC;
-    border: 1px solid #E3D9CD;
+    background-color: #FBF0F0;
+    border: 1px solid #E9CFCF;
     border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.4rem 1.5rem;
@@ -909,9 +911,9 @@ body {
 }
 
 .sk-study {
-    /* Ghost tint, same as the overview cards above. */
-    background-color: #F8F3EC;
-    border: 1px solid #E3D9CD;
+    /* Pink ghost tint, same as the overview cards above. */
+    background-color: #FBF0F0;
+    border: 1px solid #E9CFCF;
     border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
     padding: 1.3rem 1.5rem;
@@ -1004,13 +1006,13 @@ body {
     animation-delay: 0.2s;
 }
 
-/* Main claim heading — big, bold, dark brown (~phi^2) */
+/* Main claim heading — big, bold pink, same as the home hero title (~phi^2) */
 #claim {
     font-family: 'Montserrat', sans-serif;
     font-size: 2.6rem;
     font-weight: 800;
     line-height: 1.2;
-    color: var(--ink);
+    color: var(--title-pink);
     margin: 0 0 2.25rem 0;
 }
 
@@ -1019,7 +1021,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.25rem; /* lead */
     font-weight: 600;
-    color: var(--ink);
+    color: var(--pink-ink);
     margin: 0 0 1.1rem 0;
 }
 
@@ -1031,9 +1033,9 @@ body {
     margin-bottom: 2.5rem;
 }
 
-/* Rounded white card with a pink top accent — matches the results page */
+/* Rounded pink-tinted card with a pink top accent — matches the results page */
 .report-card {
-    background-color: var(--white);
+    background-color: var(--paper-pink);
     border: 1px solid var(--border-pink);
     border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
@@ -1060,7 +1062,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.85rem; /* small */
     font-weight: 600;
-    color: var(--ink-soft);
+    color: var(--pink-ink);
     margin: 0 0 0.7rem 0;
 }
 
@@ -1088,7 +1090,7 @@ body {
 }
 
 .study-card {
-    background-color: var(--white);
+    background-color: var(--paper-pink);
     border: 1px solid var(--border-pink);
     border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
@@ -1121,14 +1123,14 @@ body {
 
 .studyID {
     margin: 0;
-    color: var(--ink);
+    color: var(--title-pink);
     font-family: 'Montserrat', sans-serif;
     font-size: 1.25rem; /* lead */
     font-weight: 700;
 }
 
 .study-score {
-    color: var(--ink-soft);
+    color: var(--pink-ink);
     font-family: 'Montserrat', sans-serif;
     font-size: 0.85rem; /* small */
     font-weight: 600;
@@ -1145,7 +1147,7 @@ body {
 }
 
 .report-empty {
-    background-color: var(--white);
+    background-color: var(--paper-pink);
     border: 1px solid var(--border-pink);
     border-top: 4px solid var(--accent-pink);
     border-radius: 1rem;
@@ -1153,7 +1155,7 @@ body {
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
-    color: var(--ink-soft);
+    color: var(--pink-ink);
     margin: 0;
 }
 
