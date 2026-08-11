@@ -151,6 +151,7 @@ body {
 
 /* Big pink title, two lines */
 .home-title {
+    position: relative;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 2.6rem;
@@ -159,13 +160,27 @@ body {
     margin: 0;
 }
 
-/* Subtitle: smaller, darker brown-grey, regular */
+/* Subtle pink underline between the title and the subtitle — same accent
+   bar as the report page's claim headline. */
+.home-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.85rem;
+    width: 5.5rem;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: var(--accent-pink);
+}
+
+/* Subtitle: smaller, darker brown-grey, regular. Extra top margin clears
+   the pink underline bar above it. */
 .home-subtitle {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
     font-size: 1.25rem;
     color: #6E5F63;
-    margin: 0.7rem 0 0 0;
+    margin: 1.7rem 0 0 0;
 }
 
 /* Search bar row */
