@@ -80,6 +80,11 @@ body {
     display: block;
     border-radius: 50%;
     background-color: var(--white);
+    transition: transform 0.2s ease;
+}
+
+.logo:hover .logopic {
+    transform: scale(1.06);
 }
 
 /* Header navigation — far right, medium weight */
@@ -196,6 +201,10 @@ body {
     box-shadow: 0 0 0 3px rgba(224, 136, 136, 0.25);
 }
 
+.searchbarbar:hover {
+    border-color: var(--title-pink);
+}
+
 /* Circular pink search button, immediately right of the input */
 #search-button {
     flex-shrink: 0;
@@ -214,6 +223,16 @@ body {
     transform: translateY(-2px);
     background-color: var(--title-pink);
     box-shadow: 0 6px 16px rgba(224, 136, 136, 0.45);
+}
+
+#search-button:active {
+    transform: translateY(0) scale(0.93);
+    box-shadow: 0 2px 8px rgba(224, 136, 136, 0.35);
+}
+
+#search-button:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
 }
 
 .searchbutton {
@@ -246,6 +265,12 @@ body {
     border-radius: 1rem;
     padding: 2.75rem 3rem;
     border: 1px solid #EAE4DC;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
 }
 
 /* ============ Contact Us card ============ */
@@ -282,6 +307,16 @@ body {
     box-shadow: 0 6px 16px rgba(224, 136, 136, 0.35);
 }
 
+.contact-mailto:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: none;
+}
+
+.contact-mailto:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
+}
+
 /* ============ Scroll reveal (About Us / Methodology) ============ */
 
 .reveal {
@@ -311,6 +346,16 @@ body {
 
     .sk-leaving {
         transition: none;
+    }
+
+    body.page-leaving,
+    body.page-entering {
+        opacity: 1;
+        transition: none;
+    }
+
+    .live-suggestions {
+        animation: none;
     }
 }
 
@@ -401,6 +446,10 @@ body {
 .chip-query:hover {
     background-color: #FBDADA;
     transform: translateY(-1px);
+}
+
+.chip-query:active {
+    transform: translateY(0) scale(0.96);
 }
 
 .chip-query:focus-visible {
@@ -556,6 +605,15 @@ body {
     box-shadow: var(--shadow-lift);
 }
 
+.result-card:active {
+    transform: translateY(0);
+}
+
+.result-card:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 3px;
+}
+
 .result-id {
     align-self: flex-start;
     background-color: #FBEAEA;
@@ -615,6 +673,12 @@ body {
     font-weight: 600;
     padding: 0.25rem 0.6rem;
     border-radius: 9999px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.study-mini:hover {
+    background-color: #F3E9E9;
+    border-color: #EAC4C4;
 }
 
 .study-mini-empty {
@@ -681,6 +745,16 @@ body {
     box-shadow: 0 6px 16px rgba(248, 180, 180, 0.5);
 }
 
+.load-more:active {
+    transform: translateY(0) scale(0.96);
+}
+
+.load-more:focus-visible,
+.refresh-btn:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
+}
+
 .refresh-btn {
     background-color: var(--white);
     color: var(--ink);
@@ -691,6 +765,10 @@ body {
     transform: translateY(-2px);
     border-color: var(--title-pink);
     box-shadow: 0 6px 16px rgba(224, 136, 136, 0.3);
+}
+
+.refresh-btn:active {
+    transform: translateY(0) scale(0.96);
 }
 
 .load-more[hidden],
@@ -786,8 +864,10 @@ body {
 }
 
 .sk-card {
-    background-color: var(--white);
-    border: 1px solid var(--border);
+    /* Warm ghost tint: placeholder cards must never read as real white
+       content boxes — that's what made the old skeleton look broken. */
+    background-color: #F8F3EC;
+    border: 1px solid #E3D9CD;
     border-radius: 1rem;
     padding: 1.4rem 1.5rem;
     min-width: 0;
@@ -821,8 +901,9 @@ body {
 }
 
 .sk-study {
-    background-color: var(--white);
-    border: 1px solid var(--border);
+    /* Ghost tint, same as the overview cards above. */
+    background-color: #F8F3EC;
+    border: 1px solid #E3D9CD;
     border-radius: 1rem;
     padding: 1.3rem 1.5rem;
 }
@@ -847,9 +928,17 @@ body {
 }
 
 .sk-study-summary {
-    height: 0.85rem;
-    width: 72%;
+    height: 0.8rem;
+    width: 92%;
     border-radius: 0.35rem;
+    margin-bottom: 0.55rem;
+}
+
+/* Second line of the study summary — fills the card so it reads as a
+   skeleton block, not a hollow box. */
+.sk-study-summary.short {
+    width: 58%;
+    margin-bottom: 0;
 }
 
 /* When the report is ready, the skeleton flips to an overlay covering the
@@ -948,6 +1037,15 @@ body {
     transform: translateY(-2px);
 }
 
+.report-card:active {
+    transform: translateY(0);
+}
+
+.report-card:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
+}
+
 .report-card h3 {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.85rem; /* small */
@@ -990,6 +1088,15 @@ body {
 .study-card:hover {
     box-shadow: var(--shadow-soft);
     transform: translateY(-2px);
+}
+
+.study-card:active {
+    transform: translateY(0);
+}
+
+.study-card:focus-visible {
+    outline: 2px solid var(--title-pink);
+    outline-offset: 2px;
 }
 
 .study-card-header {
@@ -1056,6 +1163,135 @@ body {
     margin: 0;
 }
 
+/* ============ Page transitions ============ */
+
+/* Cross-page fades: JS fades the body out before navigating away and
+   fades it back in on the destination page. Pure opacity, so it layers
+   cleanly under every entrance animation on the page. */
+body.page-leaving,
+body.page-entering {
+    opacity: 0;
+}
+
+body.page-leaving {
+    transition: opacity 0.22s ease;
+}
+
+body.page-enter-done {
+    opacity: 1;
+    transition: opacity 0.22s ease;
+}
+
+/* ============ Search-as-you-type suggestions ============ */
+
+/* The home search bar anchors its live-suggestion dropdown. */
+.searcharea {
+    position: relative;
+}
+
+/* White card with a pink top accent — the same visual language as the
+   result cards, so the dropdown feels native to the site. */
+.live-suggestions {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    right: 0;
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--header-pink);
+    border-radius: 1.1rem;
+    box-shadow: var(--shadow-lift);
+    padding: 0.5rem;
+    z-index: 30;
+    animation: rise-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.live-suggestions[hidden] {
+    display: none;
+}
+
+.live-suggestion {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 0.8rem;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: background-color 0.15s ease;
+}
+
+.live-suggestion:hover,
+.live-suggestion--active {
+    background-color: #FBEAEA;
+}
+
+.live-suggestion-top {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+
+.live-pill {
+    background-color: #FBEAEA;
+    color: var(--title-pink);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem; /* micro */
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.live-pill--score {
+    background-color: #F6F0E2;
+    color: #7A6B50;
+}
+
+.live-suggestion-claim {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.live-suggestion-meta {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 0.25rem;
+}
+
+/* "See all results" footer row inside the panel */
+.live-see-all {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.3rem;
+    padding: 0.75rem 0.9rem;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 0.8rem 0.8rem;
+    color: var(--title-pink);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem; /* small */
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.live-see-all:hover {
+    color: var(--ink);
+}
+
 /* ============ Mobile ============ */
 
 @media (max-width: 640px) {
@@ -1107,5 +1343,54 @@ body {
 
     #claim {
         font-size: 1.9rem;
+    }
+}
+
+/* Small phones: tighten the hero, cards, and page gutters so nothing
+   feels cramped at 375px and under. */
+@media (max-width: 480px) {
+    .home-title {
+        font-size: 1.75rem;
+    }
+
+    .home-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .home-main {
+        padding: 2.75rem 1.1rem 2.5rem;
+    }
+
+    .nav-inner {
+        padding: 0.65rem 1.1rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+    }
+
+    .results-header {
+        padding: 0 1.1rem;
+    }
+
+    .results-header-inner {
+        padding: 1.1rem 1.15rem;
+    }
+
+    .results-wrap {
+        padding: 0 1.1rem;
+    }
+
+    .result-card,
+    .sk-result {
+        padding: 1.15rem 1.2rem;
+    }
+
+    .results-actions {
+        padding: 0 1.1rem 2.5rem;
+    }
+
+    .report-main {
+        padding: 2.25rem 1.1rem 3rem;
     }
 }

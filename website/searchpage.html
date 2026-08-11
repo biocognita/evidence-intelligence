@@ -7,7 +7,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="style.css?v=22" rel="stylesheet" type="text/css"/>
+        <link rel="icon" href="assets/images/biocognitalogo.png">
+        <link href="style.css?v=23" rel="stylesheet" type="text/css"/>
     </head>
 
     <body class="bodynorm">
@@ -148,7 +149,7 @@
 
         <script src="api_config.js"></script>
         <script src="scripts.js"></script>
-        <script src="cache_utils.js"></script>
+        <script src="cache_utils.js?v=23"></script>
         <script>
             const SEARCHABLE_COLUMNS = ["Claim", "Intervention", "Outcome", "Population"];
             const PAGE_SIZE = 20;
@@ -461,7 +462,12 @@
                 clearCache(searchCacheKey());
                 const url = new URL(window.location.href);
                 url.searchParams.set("fresh", "1");
-                window.location.href = url.toString();
+                // Re-fetch via a soft page transition when available
+                if (window.transitionTo) {
+                    window.transitionTo(url.toString());
+                } else {
+                    window.location.href = url.toString();
+                }
             });
 
             loadSearchResults(true);
